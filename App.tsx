@@ -5,57 +5,41 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Landing from './components/Landing';
 import { ViewState, ArchiveImage } from './types';
-import { MOCK_IMAGES, HIDDEN_ARCHIVES, DIRECTORY_PATH } from './constants';
-import { dbService } from './services/db';
+import { apiService } from './services/api';
 
 export default function App() {
   const [view, setView] = useState<ViewState>('LANDING');
   const [currentAgent, setCurrentAgent] = useState<string>('');
   const [isReadOnly, setIsReadOnly] = useState<boolean>(false);
-  
-  // Shared State for Images
   const [images, setImages] = useState<ArchiveImage[]>([]);
 
-  // Initialize DB and Load Data
   useEffect(() => {
-    const loadFromDB = async () => {
-        try {
-            await dbService.connect();
-            const storedImages = await dbService.getAllArchives();
-            
-            if (storedImages.length > 0) {
-                setImages(storedImages);
-            } else {
-                // Initial Seed if DB is empty (First time load)
-                const seedImages = MOCK_IMAGES.map((url, i) => ({
-                    id: `mock-${i}`,
-                    url,
-                    thumbnailUrl: url,
-                    timestamp: new Date().toISOString(),
-                    clearanceLevel: (i % 2 === 0 ? 'TOP SECRET' : 'CLASSIFIED') as any,
-                    name: `MISSION_PHOTO_00${i + 1}`,
-                    fileName: `evidence_batch_${i + 1}.jpg`,
-                    virtualPath: DIRECTORY_PATH,
-                    description: 'Intelligence recovered from Operation Strix field work.'
-                }));
-                setImages(seedImages);
-            }
-        } catch (e) {
-            console.error("Failed to load from DB:", e);
-        }
+    const initDB = async () => {
+      try {
+        await apiService.initDatabase();
+      } catch (error) {
+        console.error('Failed to initialize database:', error);
+      }
     };
-    loadFromDB();
+    initDB();
   }, []);
+
+  const loadImages = async () => {
+    try {
+      const fetchedImages = await apiService.getImages();
+      setImages(fetchedImages);
+    } catch (error) {
+      console.error('Failed to load images:', error);
+      setImages([]);
+    }
+  };
 
   const handleAddImage = (newImage: ArchiveImage) => {
     setImages(prev => [newImage, ...prev]);
   };
 
   const handleVisitorEntry = async () => {
-    // Reload from DB to ensure visitor sees latest data
-    const freshData = await dbService.getAllArchives();
-    if (freshData.length > 0) setImages(freshData);
-
+    await loadImages();
     setIsReadOnly(true);
     setCurrentAgent('GUEST');
     setView('DASHBOARD');
@@ -66,10 +50,7 @@ export default function App() {
   };
 
   const handleLoginSuccess = async (agentId: string) => {
-     // Reload from DB
-    const freshData = await dbService.getAllArchives();
-    if (freshData.length > 0) setImages(freshData);
-
+    await loadImages();
     setIsReadOnly(false);
     setCurrentAgent(agentId);
     setView('DASHBOARD');

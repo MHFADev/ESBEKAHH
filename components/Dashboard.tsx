@@ -3,17 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, Upload, Lock, Star, PeanutIcon, Crosshair, RoseIcon, TulipIcon, ButterflyIcon, Search, AlertTriangle } from './Icons';
 import { ArchiveImage } from '../types';
 import { CHARACTERS, DIRECTORY_PATH, DB_CONFIG } from '../constants';
-import { dbService } from '../services/db';
+import { apiService } from '../services/api';
 
-// --- UTILITY: IMAGE COMPRESSOR & BLOB CONVERTER ---
-const compressImageToBlob = (file: File, quality = 0.8, maxWidth = 800): Promise<Blob> => {
+const compressImageToBase64 = (file: File, quality = 0.7, maxWidth = 600): Promise<string> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = (event) => {
             const img = new Image();
             img.src = event.target?.result as string;
-            
+
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 let width = img.width;
@@ -26,14 +25,11 @@ const compressImageToBlob = (file: File, quality = 0.8, maxWidth = 800): Promise
 
                 canvas.width = width;
                 canvas.height = height;
-                
+
                 const ctx = canvas.getContext('2d');
                 ctx?.drawImage(img, 0, 0, width, height);
-                
-                canvas.toBlob((blob) => {
-                    if (blob) resolve(blob);
-                    else reject(new Error("Compression failed"));
-                }, 'image/jpeg', quality);
+
+                resolve(canvas.toDataURL('image/jpeg', quality));
             };
 
             img.onerror = (err) => reject(err);
@@ -53,16 +49,32 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLogout, images, onAddImage }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ArchiveImage | null>(null);
-  
-  // Upload Form State
+  const [fullImageUrl, setFullImageUrl] = useState<string>('');
+  const [loadingFullImage, setLoadingFullImage] = useState(false);
+
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  
-  // State
+
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageClick = async (img: ArchiveImage) => {
+    setSelectedImage(img);
+    setLoadingFullImage(true);
+    setFullImageUrl('');
+
+    try {
+      const url = await apiService.getFullImage(img.id);
+      setFullImageUrl(url);
+    } catch (error) {
+      console.error('Failed to load full image:', error);
+      setFullImageUrl(img.thumbnailUrl);
+    } finally {
+      setLoadingFullImage(false);
+    }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -86,16 +98,26 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
         const safeName = newTitle.toLowerCase().replace(/[^a-z0-9]/g, '_') || 'evidence';
         const ext = selectedFile.name.split('.').pop() || 'jpg';
         const finalFileName = `${safeName}_${Date.now()}.${ext}`;
-
-        // 1. COMPRESSION PROCESS
-        const thumbnailBlob = await compressImageToBlob(selectedFile, 0.8, 800);
-        
-        // 2. DATABASE TRANSACTION
         const newImageId = Math.random().toString(36).substr(2, 9);
+
+        const thumbnailData = await compressImageToBase64(selectedFile, 0.6, 400);
+        const originalData = await compressImageToBase64(selectedFile, 0.75, 1200);
+
+        await apiService.uploadImage({
+          id: newImageId,
+          name: newTitle || `INTEL_REC_${Math.floor(Math.random() * 1000)}`,
+          description: newDesc || 'No additional intelligence provided.',
+          fileName: finalFileName,
+          virtualPath: DIRECTORY_PATH,
+          clearanceLevel: 'TOP SECRET',
+          thumbnailData,
+          originalData
+        });
+
         const newImage: ArchiveImage = {
           id: newImageId,
-          url: previewUrl, 
-          thumbnailUrl: URL.createObjectURL(thumbnailBlob), 
+          url: '',
+          thumbnailUrl: thumbnailData,
           timestamp: new Date().toISOString(),
           clearanceLevel: 'TOP SECRET',
           name: newTitle || `INTEL_REC_${Math.floor(Math.random() * 1000)}`,
@@ -104,11 +126,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
           virtualPath: DIRECTORY_PATH
         };
 
-        // Save to IndexedDB
-        await dbService.insertArchive(newImage, selectedFile, thumbnailBlob);
         onAddImage(newImage);
-        
-        // Success: Close Modal
         closeModal();
 
     } catch (error) {
@@ -372,27 +390,35 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                         <button className="text-white hover:text-spy-red font-display text-xl">CLOSE X</button>
                     </div>
                     
-                    <motion.div 
+                    <motion.div
                         initial={{ scale: 0.8 }}
                         animate={{ scale: 1 }}
                         exit={{ scale: 0.8 }}
                         className="relative max-w-5xl max-h-screen"
                         onClick={(e) => e.stopPropagation()}
                     >
-                         {/* High Res Image */}
-                        <img 
-                            src={selectedImage.url} 
-                            alt="High Res" 
-                            className="max-h-[85vh] w-auto border-2 border-spy-gold/30 shadow-[0_0_50px_rgba(197,160,89,0.2)]"
-                        />
-                        <div className="bg-spy-dark/80 text-spy-cream p-4 mt-2 border-t border-spy-gold">
-                            <h3 className="font-display text-2xl text-spy-gold">{selectedImage.name}</h3>
-                            <div className="font-mono text-xs opacity-70 mb-2 flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                                FETCHED FROM: {DB_CONFIG.dbName}.public.archives
+                         {loadingFullImage ? (
+                            <div className="flex flex-col items-center justify-center p-20 bg-spy-dark/50 rounded-lg border border-spy-gold/30">
+                                <div className="w-16 h-16 border-4 border-spy-gold border-t-transparent rounded-full animate-spin mb-4"></div>
+                                <p className="text-spy-cream font-mono text-sm">LOADING FULL RESOLUTION...</p>
                             </div>
-                            <p className="font-serif italic">{selectedImage.description}</p>
-                        </div>
+                         ) : (
+                            <>
+                                <img
+                                    src={fullImageUrl || selectedImage.thumbnailUrl}
+                                    alt="High Res"
+                                    className="max-h-[85vh] w-auto border-2 border-spy-gold/30 shadow-[0_0_50px_rgba(197,160,89,0.2)]"
+                                />
+                                <div className="bg-spy-dark/80 text-spy-cream p-4 mt-2 border-t border-spy-gold">
+                                    <h3 className="font-display text-2xl text-spy-gold">{selectedImage.name}</h3>
+                                    <div className="font-mono text-xs opacity-70 mb-2 flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                                        FETCHED FROM: {DB_CONFIG.dbName}.public.archives
+                                    </div>
+                                    <p className="font-serif italic">{selectedImage.description}</p>
+                                </div>
+                            </>
+                         )}
                     </motion.div>
                 </motion.div>
             )}
@@ -407,7 +433,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                 layoutId={img.id}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                onClick={() => setSelectedImage(img)}
+                onClick={() => handleImageClick(img)}
                 className="break-inside-avoid relative group perspective-1000 cursor-pointer"
               >
                 <div className={`relative overflow-hidden shadow-2xl transition-transform duration-500 group-hover:-translate-y-2 flex flex-col ${
