@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ESBEKAHH | Operation Strix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=JetBrains+Mono:wght@300;400;500;700&family=Oregano&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            cursor: {
+              crosshair: 'crosshair',
+            },
+            colors: {
+              spy: {
+                dark: '#050505', // Deep Black (Item)
+                navy: '#0B1026', // Deep Navy (Biru Tua)
+                red: '#722F37', // Deep Maroon/Red (Mawar Merah Tua - Yor Style)
+                gold: '#C5A059', // Elegant Gold
+                cream: '#F4F1EA', // Paper
+              },
+              garden: {
+                pink: '#FFB7C5', // Soft Pink (Sakura)
+                rose: '#E14D68', // Vivid Rose
+                tulip: '#FF8FAB', // Tulip Pink
+                light: '#FFF0F5', // Lavender Blush
+              },
+              anya: {
+                hair: '#FFD1DC', // Pastel Pink
+                peanut: '#D4A373', // Peanut Color
+              }
+            },
+            fontFamily: {
+              serif: ['"Playfair Display"', 'serif'], 
+              display: ['"Cinzel"', 'serif'], 
+              mono: ['"JetBrains Mono"', 'monospace'], 
+              hand: ['"Oregano"', 'cursive'], 
+            },
+            animation: {
+              'float': 'float 6s ease-in-out infinite',
+              'wiggle': 'wiggle 1s ease-in-out infinite',
+              'spin-slow': 'spin 12s linear infinite',
+              'pulse-glow': 'pulseGlow 3s infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-20px)' },
+              },
+              wiggle: {
+                '0%, 100%': { transform: 'rotate(-3deg)' },
+                '50%': { transform: 'rotate(3deg)' },
+              },
+              pulseGlow: {
+                 '0%, 100%': { opacity: 0.5, transform: 'scale(1)' },
+                 '50%': { opacity: 1, transform: 'scale(1.05)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        margin: 0;
+        background-color: #050505;
+        color: #F4F1EA;
+        overflow-x: hidden;
+        cursor: none;
+      }
+      /* Elegant Floral Texture Overlay */
+      .bg-floral-pattern {
+        background-image: 
+          radial-gradient(#C5A059 0.5px, transparent 0.5px),
+          radial-gradient(#722F37 0.5px, #0B1026 0.5px);
+        background-size: 20px 20px;
+        opacity: 0.1;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "framer-motion": "https://esm.sh/framer-motion@^12.23.26"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
