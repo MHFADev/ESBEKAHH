@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Upload, Lock, Star, PeanutIcon, Crosshair, RoseIcon, TulipIcon, ButterflyIcon, Search, AlertTriangle } from './Icons';
+import { LogOut, Upload, Lock, Star, PeanutIcon, RoseIcon, TulipIcon, ButterflyIcon, Search } from './Icons';
 import { ArchiveImage } from '../types';
 import { CHARACTERS, DIRECTORY_PATH, DB_CONFIG } from '../constants';
 import { apiService } from '../services/api';
@@ -222,12 +222,23 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
       <main className="container mx-auto px-4 mt-12 relative">
         
         {!isReadOnly && (
-             <motion.img 
-                src={CHARACTERS.loid_action}
-                alt="Action"
-                className="absolute top-0 right-0 w-[400px] opacity-10 pointer-events-none z-0"
-                initial={{ x: 100, opacity: 0 }}
-                animate={{ x: 0, opacity: 0.1 }}
+             <motion.img
+                src={CHARACTERS.loid_standing}
+                alt="Loid"
+                className="absolute top-10 right-0 w-[500px] opacity-20 pointer-events-none z-0 drop-shadow-xl"
+                initial={{ x: 200, opacity: 0 }}
+                animate={{ x: 0, opacity: 0.2 }}
+                transition={{ delay: 0.3 }}
+             />
+        )}
+        {isReadOnly && (
+             <motion.img
+                src={CHARACTERS.anya_peace}
+                alt="Anya"
+                className="absolute -top-20 right-10 w-[350px] opacity-25 pointer-events-none z-0 drop-shadow-xl"
+                initial={{ x: 200, opacity: 0 }}
+                animate={{ x: 0, opacity: 0.25 }}
+                transition={{ delay: 0.3 }}
              />
         )}
         
@@ -244,13 +255,23 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
              }`}>
                  ESBEKAHH
              </h3>
-             <div className="flex justify-center items-center gap-4">
+             <div className="flex justify-center items-center gap-4 mb-4">
                  <div className={`h-[1px] w-12 ${isReadOnly ? 'bg-garden-tulip' : 'bg-spy-red'}`}></div>
                  <p className={`text-sm font-serif italic tracking-[0.3em] ${isReadOnly ? 'text-garden-tulip' : 'text-spy-gold'}`}>
                      {isReadOnly ? "PEANUTS & PISTOLS" : "FOR THE SAKE OF WORLD PEACE"}
                  </p>
                  <div className={`h-[1px] w-12 ${isReadOnly ? 'bg-garden-tulip' : 'bg-spy-red'}`}></div>
              </div>
+             {!isReadOnly && (
+                 <motion.img
+                    src={CHARACTERS.yor_portrait}
+                    alt="Yor Support"
+                    className="w-[150px] opacity-30 mx-auto pointer-events-none drop-shadow-lg"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 0.3 }}
+                    transition={{ delay: 0.5, type: 'spring', damping: 20 }}
+                 />
+             )}
         </div>
 
         {/* Upload Trigger */}
@@ -294,11 +315,16 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                         className="relative bg-spy-cream w-full max-w-2xl rounded-sm shadow-2xl overflow-hidden border-4 border-spy-dark"
                         style={{ backgroundImage: 'repeating-linear-gradient(#f5f5dc 0px, #f5f5dc 24px, #e5e5cc 25px)' }}
                     >
-                        <div className="bg-spy-red p-4 flex justify-between items-center text-spy-cream">
-                            <h3 className="font-display font-bold text-xl tracking-widest flex items-center gap-2">
+                        <div className="bg-spy-red p-4 flex justify-between items-center text-spy-cream relative overflow-hidden">
+                            <motion.img
+                                src={CHARACTERS.loid_gun}
+                                alt="Loid"
+                                className="absolute right-0 top-0 h-full opacity-10 pointer-events-none drop-shadow-lg object-contain"
+                            />
+                            <h3 className="font-display font-bold text-xl tracking-widest flex items-center gap-2 relative z-10">
                                 <Lock className="w-5 h-5" /> CLASSIFIED DOSSIER
                             </h3>
-                            <button onClick={() => !isUploading && closeModal()} className="hover:text-spy-gold font-bold disabled:opacity-50" disabled={isUploading}>CLOSE X</button>
+                            <button onClick={() => !isUploading && closeModal()} className="hover:text-spy-gold font-bold disabled:opacity-50 relative z-10" disabled={isUploading}>CLOSE X</button>
                         </div>
 
                         {/* Standard Form with Loader Overlay */}

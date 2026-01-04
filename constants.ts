@@ -25,12 +25,12 @@ export const MOCK_IMAGES = [
 // &n=-1 ensures we don't get a cached error
 // &output=png ensures we keep transparency
 export const CHARACTERS = {
-  anya_peace: 'https://images.weserv.nl/?url=https://www.pngmart.com/files/22/Spy-x-Family-Anya-Forger-PNG-Transparent.png&output=png&n=-1',
+  anya_peace: '/f9a0406a2d3f7e470eb51dc540a463ca.png',
   anya_bond: 'https://images.weserv.nl/?url=https://www.pngmart.com/files/22/Spy-x-Family-Bond-Forger-PNG-HD-Isolated.png&output=png&n=-1',
-  loid_standing: 'https://images.weserv.nl/?url=https://www.pngmart.com/files/22/Spy-x-Family-Loid-Forger-PNG-Isolated-HD.png&output=png&n=-1',
-  loid_action: 'https://images.weserv.nl/?url=https://www.pngmart.com/files/22/Spy-x-Family-Loid-Forger-PNG-Transparent-Image.png&output=png&n=-1',
-  yor_portrait: 'https://images.weserv.nl/?url=https://www.pngmart.com/files/22/Spy-x-Family-Yor-Forger-PNG-Clipart.png&output=png&n=-1',
-  loid_gun: 'https://images.weserv.nl/?url=https://www.pngmart.com/files/22/Spy-x-Family-Loid-Forger-PNG-HD.png&output=png&n=-1'
+  loid_standing: '/loid_forger_anime_3_png.png',
+  loid_action: '/loid_forger_anime_3_png.png',
+  yor_portrait: '/767-lg.png',
+  loid_gun: '/loid_forger_anime_3_png.png'
 };
 
 // Data for simulation mode
