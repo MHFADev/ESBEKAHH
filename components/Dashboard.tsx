@@ -287,6 +287,18 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 0.2 }}
              />
+             <motion.img 
+                src={CHARACTERS.rose}
+                alt="Decorative Rose"
+                className="absolute top-0 left-0 w-32 opacity-10 pointer-events-none z-0 mix-blend-screen"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+             />
+             <motion.img 
+                src={CHARACTERS.tulips}
+                alt="Decorative Tulips"
+                className="absolute bottom-0 right-10 w-40 opacity-10 pointer-events-none z-0 mix-blend-screen"
+             />
           </>
         )}
         

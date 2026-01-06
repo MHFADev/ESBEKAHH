@@ -30,7 +30,10 @@ export const CHARACTERS = {
   loid_standing: '/assets/loid_standing.png',
   loid_action: '/assets/loid_aiming.png',
   yor_portrait: '/assets/yor_portrait.png',
-  loid_gun: '/assets/loid_aiming.png'
+  loid_gun: '/assets/loid_aiming.png',
+  rose: '/attached_assets/Desain_tanpa_judul_20260106_143956_0000_1767685233132.png',
+  tulips: '/attached_assets/20260106_143652_0000_1767685257653.png',
+  white_tulip: '/attached_assets/Desain_tanpa_judul_20260106_143827_0000_1767685257511.png'
 };
 
 // Data for simulation mode
