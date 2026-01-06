@@ -7,6 +7,7 @@ import Landing from './components/Landing';
 import { ViewState, ArchiveImage } from './types';
 import { MOCK_IMAGES, HIDDEN_ARCHIVES, DIRECTORY_PATH } from './constants';
 import { dbService } from './services/db';
+import { apiService } from './services/api';
 
 export default function App() {
   const [view, setView] = useState<ViewState>('LANDING');
@@ -16,35 +17,21 @@ export default function App() {
   // Shared State for Images
   const [images, setImages] = useState<ArchiveImage[]>([]);
 
-  // Initialize DB and Load Data
+  // Initialize DB and Load Data from Supabase
   useEffect(() => {
-    const loadFromDB = async () => {
-        try {
-            await dbService.connect();
-            const storedImages = await dbService.getAllArchives();
-            
-            if (storedImages.length > 0) {
-                setImages(storedImages);
-            } else {
-                // Initial Seed if DB is empty (First time load)
-                const seedImages = MOCK_IMAGES.map((url, i) => ({
-                    id: `mock-${i}`,
-                    url,
-                    thumbnailUrl: url,
-                    timestamp: new Date().toISOString(),
-                    clearanceLevel: (i % 2 === 0 ? 'TOP SECRET' : 'CLASSIFIED') as any,
-                    name: `MISSION_PHOTO_00${i + 1}`,
-                    fileName: `evidence_batch_${i + 1}.jpg`,
-                    virtualPath: DIRECTORY_PATH,
-                    description: 'Intelligence recovered from Operation Strix field work.'
-                }));
-                setImages(seedImages);
-            }
-        } catch (e) {
-            console.error("Failed to load from DB:", e);
+    const loadImages = async () => {
+      try {
+        await apiService.initDatabase();
+        const fetchedImages = await apiService.getImages();
+        if (fetchedImages && fetchedImages.length > 0) {
+          setImages(fetchedImages);
         }
+      } catch (e) {
+        console.error("Failed to load from Supabase:", e);
+        setImages([]);
+      }
     };
-    loadFromDB();
+    loadImages();
   }, []);
 
   const handleAddImage = (newImage: ArchiveImage) => {
@@ -52,10 +39,12 @@ export default function App() {
   };
 
   const handleVisitorEntry = async () => {
-    // Reload from DB to ensure visitor sees latest data
-    const freshData = await dbService.getAllArchives();
-    if (freshData.length > 0) setImages(freshData);
-
+    try {
+      const freshData = await apiService.getImages();
+      if (freshData && freshData.length > 0) setImages(freshData);
+    } catch (e) {
+      console.error("Failed to reload images:", e);
+    }
     setIsReadOnly(true);
     setCurrentAgent('GUEST');
     setView('DASHBOARD');
@@ -66,10 +55,12 @@ export default function App() {
   };
 
   const handleLoginSuccess = async (agentId: string) => {
-     // Reload from DB
-    const freshData = await dbService.getAllArchives();
-    if (freshData.length > 0) setImages(freshData);
-
+    try {
+      const freshData = await apiService.getImages();
+      if (freshData && freshData.length > 0) setImages(freshData);
+    } catch (e) {
+      console.error("Failed to reload images:", e);
+    }
     setIsReadOnly(false);
     setCurrentAgent(agentId);
     setView('DASHBOARD');

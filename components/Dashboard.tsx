@@ -4,6 +4,7 @@ import { LogOut, Upload, Lock, Star, PeanutIcon, Crosshair, RoseIcon, TulipIcon,
 import { ArchiveImage } from '../types';
 import { CHARACTERS, DIRECTORY_PATH, DB_CONFIG } from '../constants';
 import { dbService } from '../services/db';
+import { apiService } from '../services/api';
 
 // --- UTILITY: IMAGE COMPRESSOR & BLOB CONVERTER ---
 const compressImageToBlob = (file: File, quality = 0.8, maxWidth = 800): Promise<Blob> => {
@@ -13,7 +14,7 @@ const compressImageToBlob = (file: File, quality = 0.8, maxWidth = 800): Promise
         reader.onload = (event) => {
             const img = new Image();
             img.src = event.target?.result as string;
-            
+
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 let width = img.width;
@@ -26,14 +27,48 @@ const compressImageToBlob = (file: File, quality = 0.8, maxWidth = 800): Promise
 
                 canvas.width = width;
                 canvas.height = height;
-                
+
                 const ctx = canvas.getContext('2d');
                 ctx?.drawImage(img, 0, 0, width, height);
-                
+
                 canvas.toBlob((blob) => {
                     if (blob) resolve(blob);
                     else reject(new Error("Compression failed"));
                 }, 'image/jpeg', quality);
+            };
+
+            img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+    });
+};
+
+const compressImageToBase64 = (file: File, quality = 0.8, maxWidth = 800): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target?.result as string;
+
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, width, height);
+
+                canvas.toDataURL('image/jpeg', quality);
+                resolve(canvas.toDataURL('image/jpeg', quality));
             };
 
             img.onerror = (err) => reject(err);
@@ -88,14 +123,25 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
         const finalFileName = `${safeName}_${Date.now()}.${ext}`;
 
         // 1. COMPRESSION PROCESS
-        const thumbnailBlob = await compressImageToBlob(selectedFile, 0.8, 800);
-        
-        // 2. DATABASE TRANSACTION
-        const newImageId = Math.random().toString(36).substr(2, 9);
+        const thumbnailData = await compressImageToBase64(selectedFile, 0.6, 400);
+        const originalData = await compressImageToBase64(selectedFile, 0.75, 1200);
+
+        // 2. UPLOAD TO SUPABASE
+        const uploadResponse = await apiService.uploadImage({
+          name: newTitle || `INTEL_REC_${Math.floor(Math.random() * 1000)}`,
+          description: newDesc || 'No additional intelligence provided.',
+          fileName: finalFileName,
+          clearanceLevel: 'TOP SECRET',
+          thumbnailData,
+          originalData,
+          uploaderId: agentId
+        });
+
+        // 3. CREATE LOCAL IMAGE OBJECT
         const newImage: ArchiveImage = {
-          id: newImageId,
-          url: previewUrl, 
-          thumbnailUrl: URL.createObjectURL(thumbnailBlob), 
+          id: uploadResponse.id,
+          url: originalData,
+          thumbnailUrl: thumbnailData,
           timestamp: new Date().toISOString(),
           clearanceLevel: 'TOP SECRET',
           name: newTitle || `INTEL_REC_${Math.floor(Math.random() * 1000)}`,
@@ -104,11 +150,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
           virtualPath: DIRECTORY_PATH
         };
 
-        // Save to IndexedDB
-        await dbService.insertArchive(newImage, selectedFile, thumbnailBlob);
         onAddImage(newImage);
-        
-        // Success: Close Modal
         closeModal();
 
     } catch (error) {
