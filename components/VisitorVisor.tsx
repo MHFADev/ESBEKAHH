@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArchiveImage } from '../types';
 import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon } from './Icons';
 import { CHARACTERS } from '../constants';
+import VisionGallery from './VisionGallery';
 
 interface VisitorVisorProps {
   images: ArchiveImage[];
@@ -133,6 +134,16 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
 
         {/* Grid Content */}
         <div className="p-6 sm:p-10 relative z-40">
+          {/* New Vision Gallery */}
+          <div className="mb-16">
+            <div className="flex items-center gap-4 mb-8 justify-center">
+              <div className="h-[1px] w-12 bg-garden-pink/30"></div>
+              <h3 className="font-display font-bold text-2xl text-garden-pink tracking-widest uppercase">Visual Stream</h3>
+              <div className="h-[1px] w-12 bg-garden-pink/30"></div>
+            </div>
+            <VisionGallery images={images} />
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
             {images.map((img, idx) => (
               <motion.div
