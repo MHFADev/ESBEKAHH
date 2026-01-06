@@ -17,18 +17,24 @@ export default function App() {
   // Shared State for Images
   const [images, setImages] = useState<ArchiveImage[]>([]);
 
-  // Initialize DB and Load Data from Supabase
+  // Initialize DB and Load Data
   useEffect(() => {
     const loadImages = async () => {
       try {
+        // Coba load dari Local IndexedDB dulu (cepat & offline friendly)
+        const localData = await dbService.getAllArchives();
+        if (localData && localData.length > 0) {
+          setImages(localData);
+        }
+
+        // Kemudian coba sync/load dari Supabase
         await apiService.initDatabase();
         const fetchedImages = await apiService.getImages();
         if (fetchedImages && fetchedImages.length > 0) {
           setImages(fetchedImages);
         }
       } catch (e) {
-        console.error("Failed to load from Supabase:", e);
-        setImages([]);
+        console.error("Failed to load images:", e);
       }
     };
     loadImages();

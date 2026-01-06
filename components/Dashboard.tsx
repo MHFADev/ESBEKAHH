@@ -128,15 +128,21 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
         const originalData = await compressImageToBase64(selectedFile, 0.9, 1920);
 
         // 2. UPLOAD TO SUPABASE
-        const uploadResponse = await apiService.uploadImage({
-          name: newTitle || `INTEL_REC_${Math.floor(Math.random() * 1000)}`,
-          description: newDesc || 'No additional intelligence provided.',
-          fileName: finalFileName,
-          clearanceLevel: 'TOP SECRET',
-          thumbnailData,
-          originalData,
-          uploaderId: agentId
-        });
+        let uploadResponse;
+        try {
+          uploadResponse = await apiService.uploadImage({
+            name: newTitle || `INTEL_REC_${Math.floor(Math.random() * 1000)}`,
+            description: newDesc || 'No additional intelligence provided.',
+            fileName: finalFileName,
+            clearanceLevel: 'TOP SECRET',
+            thumbnailData,
+            originalData,
+            uploaderId: agentId
+          });
+        } catch (e) {
+          console.warn("Supabase upload failed, falling back to local IDB:", e);
+          uploadResponse = { success: true, id: `local_${Date.now()}` };
+        }
 
         // 3. CREATE LOCAL IMAGE OBJECT
         const newImage: ArchiveImage = {
@@ -150,6 +156,18 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
           fileName: finalFileName,
           virtualPath: DIRECTORY_PATH
         };
+
+        // 4. PERSIST TO LOCAL IDB (Safety fallback)
+        try {
+          // Convert Base64 back to Blob for IndexedDB storage
+          const resOrig = await fetch(originalData);
+          const blobOrig = await resOrig.blob();
+          const resThumb = await fetch(thumbnailData);
+          const blobThumb = await resThumb.blob();
+          await dbService.insertArchive(newImage, blobOrig, blobThumb);
+        } catch (e) {
+          console.error("Local storage failed:", e);
+        }
 
         onAddImage(newImage);
         closeModal();
@@ -428,6 +446,19 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                                 src={selectedImage.url} 
                                 alt="High Res" 
                                 className="max-h-[85vh] w-auto border-2 border-spy-gold/30 shadow-[0_0_50px_rgba(197,160,89,0.2)] object-contain"
+                                onLoad={(e) => {
+                                  const img = e.currentTarget;
+                                  if (img.naturalWidth < 10 && img.src.startsWith('blob:')) {
+                                    console.error("Blob image seems corrupted or empty");
+                                  }
+                                }}
+                                onError={(e) => {
+                                  console.error("Image failed to load:", selectedImage.url);
+                                  // Fallback ke thumbnail jika original gagal
+                                  if (selectedImage.thumbnailUrl && e.currentTarget.src !== selectedImage.thumbnailUrl) {
+                                    e.currentTarget.src = selectedImage.thumbnailUrl;
+                                  }
+                                }}
                             />
                             {/* Overlay Indikator HD */}
                             <div className="absolute top-4 left-4 bg-spy-red/80 px-2 py-1 border border-spy-gold/50 rounded flex items-center gap-1.5 shadow-lg pointer-events-none">
