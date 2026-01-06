@@ -5,6 +5,7 @@ import { ArchiveImage } from '../types';
 import { CHARACTERS, DIRECTORY_PATH, DB_CONFIG } from '../constants';
 import { dbService } from '../services/db';
 import { apiService } from '../services/api';
+import VisitorVisor from './VisitorVisor';
 
 // --- UTILITY: IMAGE COMPRESSOR & BLOB CONVERTER ---
 const compressImageToBlob = (file: File, quality = 0.8, maxWidth = 800): Promise<Blob> => {
@@ -271,7 +272,9 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
       {/* Main Content */}
       <main className="container mx-auto px-4 mt-12 relative">
         
-        {!isReadOnly && (
+        {isReadOnly ? (
+          <VisitorVisor images={images} agentId={agentId} />
+        ) : (
           <>
              <motion.img 
                 src={CHARACTERS.loid_action}
@@ -299,52 +302,50 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                 alt="Decorative Tulips"
                 className="absolute bottom-0 right-10 w-40 opacity-10 pointer-events-none z-0 mix-blend-screen"
              />
-          </>
-        )}
-        
-        <div className="mb-16 text-center relative z-10">
-             <motion.div 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg h-32 blur-[80px] rounded-full -z-10 ${
-                    isReadOnly ? 'bg-garden-pink/20' : 'bg-spy-red/10'
-                }`}
-             />
-             <h3 className={`text-5xl md:text-7xl font-display font-black tracking-widest mb-4 ${
-                 isReadOnly ? 'text-garden-pink drop-shadow-[0_0_10px_rgba(255,183,197,0.5)]' : 'text-spy-cream'
-             }`}>
-                 ESBEKAHH
-             </h3>
-             <div className="flex justify-center items-center gap-4">
-                 <div className={`h-[1px] w-12 ${isReadOnly ? 'bg-garden-tulip' : 'bg-spy-red'}`}></div>
-                 <p className={`text-sm font-serif italic tracking-[0.3em] ${isReadOnly ? 'text-garden-tulip' : 'text-spy-gold'}`}>
-                     {isReadOnly ? "PEANUTS & PISTOLS" : "FOR THE SAKE OF WORLD PEACE"}
-                 </p>
-                 <div className={`h-[1px] w-12 ${isReadOnly ? 'bg-garden-tulip' : 'bg-spy-red'}`}></div>
-             </div>
-        </div>
 
-        {/* Upload Trigger */}
-        {!isReadOnly && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mb-16 text-center relative"
-          >
-            <div className="inline-block relative group cursor-pointer z-20">
-              <div className="absolute inset-0 bg-spy-red blur-lg opacity-20 group-hover:opacity-40 transition-opacity" />
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="relative bg-spy-dark border border-spy-red text-spy-red px-10 py-5 rounded-sm flex items-center gap-4 transition-all group-hover:bg-spy-red group-hover:text-spy-cream overflow-hidden shadow-2xl"
-              >
-                <div className="absolute top-0 right-0 p-1">
-                    <div className="w-2 h-2 bg-spy-gold rounded-full animate-pulse"></div>
+            <div className="mb-16 text-center relative z-10">
+                <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg h-32 blur-[80px] rounded-full -z-10 ${
+                        isReadOnly ? 'bg-garden-pink/20' : 'bg-spy-red/10'
+                    }`}
+                />
+                <h3 className={`text-5xl md:text-7xl font-display font-black tracking-widest mb-4 ${
+                    isReadOnly ? 'text-garden-pink drop-shadow-[0_0_10px_rgba(255,183,197,0.5)]' : 'text-spy-cream'
+                }`}>
+                    ESBEKAHH
+                </h3>
+                <div className="flex justify-center items-center gap-4">
+                    <div className={`h-[1px] w-12 ${isReadOnly ? 'bg-garden-tulip' : 'bg-spy-red'}`}></div>
+                    <p className={`text-sm font-serif italic tracking-[0.3em] ${isReadOnly ? 'text-garden-tulip' : 'text-spy-gold'}`}>
+                        {isReadOnly ? "PEANUTS & PISTOLS" : "FOR THE SAKE OF WORLD PEACE"}
+                    </p>
+                    <div className={`h-[1px] w-12 ${isReadOnly ? 'bg-garden-tulip' : 'bg-spy-red'}`}></div>
                 </div>
-                <Upload className="w-6 h-6" />
-                <span className="font-display tracking-widest font-bold">ADD NEW INTEL</span>
-              </button>
             </div>
-          </motion.div>
+
+            {/* Upload Trigger */}
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mb-16 text-center relative"
+            >
+                <div className="inline-block relative group cursor-pointer z-20">
+                <div className="absolute inset-0 bg-spy-red blur-lg opacity-20 group-hover:opacity-40 transition-opacity" />
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="relative bg-spy-dark border border-spy-red text-spy-red px-10 py-5 rounded-sm flex items-center gap-4 transition-all group-hover:bg-spy-red group-hover:text-spy-cream overflow-hidden shadow-2xl"
+                >
+                    <div className="absolute top-0 right-0 p-1">
+                        <div className="w-2 h-2 bg-spy-gold rounded-full animate-pulse"></div>
+                    </div>
+                    <Upload className="w-6 h-6" />
+                    <span className="font-display tracking-widest font-bold">ADD NEW INTEL</span>
+                </button>
+                </div>
+            </motion.div>
+          </>
         )}
 
         {/* UPLOAD MODAL */}
