@@ -90,8 +90,15 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
               </motion.div>
             </div>
             <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <Star className="w-3 h-3 text-spy-gold fill-spy-gold" />
+                <span className="text-[10px] font-serif font-bold text-spy-gold tracking-[0.2em] uppercase whitespace-nowrap">
+                  Anak Kesayangan Bu Retno
+                </span>
+                <Star className="w-3 h-3 text-spy-gold fill-spy-gold" />
+              </div>
               <h1 className="text-4xl sm:text-6xl font-display font-black text-white tracking-tighter flex flex-wrap items-center gap-x-4">
-                <span className="text-garden-pink drop-shadow-[0_0_15px_rgba(255,183,197,0.3)]">ANYA</span>
+                <span className="text-garden-pink drop-shadow-[0_0_15px_rgba(255,183,197,0.3)]">ESBEKAHH</span>
                 <span className="text-spy-gold/40">ARCHIVE</span>
               </h1>
               <div className="flex flex-wrap items-center gap-3 mt-4">

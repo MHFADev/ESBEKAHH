@@ -299,6 +299,13 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                         isReadOnly ? 'bg-garden-pink/20' : 'bg-spy-red/10'
                     }`}
                 />
+                <div className="flex justify-center items-center gap-2 mb-4">
+                    <Star className="w-4 h-4 text-spy-gold fill-spy-gold" />
+                    <span className="text-xs font-serif font-bold text-spy-gold tracking-[0.3em] uppercase">
+                        Anak Kesayangan Bu Retno
+                    </span>
+                    <Star className="w-4 h-4 text-spy-gold fill-spy-gold" />
+                </div>
                 <h3 className={`text-5xl md:text-7xl font-display font-black tracking-widest mb-4 ${
                     isReadOnly ? 'text-garden-pink drop-shadow-[0_0_10px_rgba(255,183,197,0.5)]' : 'text-spy-cream'
                 }`}>
