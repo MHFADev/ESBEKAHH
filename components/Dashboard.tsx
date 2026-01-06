@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Upload, Lock, Star, PeanutIcon, Crosshair, RoseIcon, TulipIcon, ButterflyIcon, Search, AlertTriangle } from './Icons';
+import { LogOut, Upload, Lock, Star, PeanutIcon, Crosshair, RoseIcon, TulipIcon, ButterflyIcon, Search, AlertTriangle, BlueElement } from './Icons';
 import { ArchiveImage } from '../types';
 import { CHARACTERS, DIRECTORY_PATH, DB_CONFIG } from '../constants';
 import { dbService } from '../services/db';
@@ -250,6 +250,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
 
         <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-2 bg-black/40 px-4 py-1.5 rounded-full border border-spy-gold/30">
+                <BlueElement className="w-4 h-4" />
                 <Star className="w-4 h-4 fill-spy-gold text-spy-gold" />
                 <span className="text-spy-gold font-bold font-mono">8</span>
                 <span className="text-gray-600 text-xs">STELLA</span>

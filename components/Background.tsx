@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { PeanutIcon, Crosshair, ButterflyIcon, RoseIcon, TulipIcon } from './Icons';
+import { PeanutIcon, Crosshair, ButterflyIcon, RoseIcon, TulipIcon, BlueElement } from './Icons';
 
 const Background: React.FC = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -41,6 +41,16 @@ const Background: React.FC = () => {
     size: Math.random() * 20 + 15,
     duration: Math.random() * 18 + 12,
     delay: Math.random() * 3,
+  }));
+
+  // Blue Elements (Spy Side)
+  const blueElements = Array.from({ length: 4 }).map((_, i) => ({
+    id: `b-el-${i}`,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 15 + 10,
+    duration: Math.random() * 30 + 20,
+    delay: Math.random() * 15,
   }));
 
   return (
@@ -131,6 +141,29 @@ const Background: React.FC = () => {
           style={{ width: b.size, height: b.size }}
         >
           <ButterflyIcon className="w-full h-full" />
+        </motion.div>
+      ))}
+
+      {/* Floating Blue Elements */}
+      {blueElements.map((be) => (
+        <motion.div
+          key={be.id}
+          className="absolute text-spy-blue/20"
+          initial={{ x: `${be.x}vw`, y: `110vh`, rotate: 0 }}
+          animate={{ 
+            y: `-10vh`, 
+            rotate: 360,
+            x: [`${be.x}vw`, `${be.x + (Math.random() * 10 - 5)}vw`]
+          }}
+          transition={{
+            duration: be.duration,
+            repeat: Infinity,
+            delay: be.delay,
+            ease: "linear",
+          }}
+          style={{ width: be.size, height: be.size }}
+        >
+          <BlueElement className="w-full h-full" />
         </motion.div>
       ))}
     </div>

@@ -40,14 +40,24 @@ export const ButterflyIcon: React.FC<{ className?: string }> = ({ className }) =
 );
 
 export const RoseIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 2C10 2 8 3 7 5C5 4 3 5 2 7C4 9 6 8 8 9C7 11 5 12 3 14C5 17 9 16 11 15C10 18 8 20 6 22C9 21 11 19 12 17C13 19 15 21 18 22C16 20 14 18 13 15C15 16 19 17 21 14C19 12 17 11 16 9C18 8 20 9 22 7C21 5 19 4 17 5C16 3 14 2 12 2Z" />
+  <svg viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 4C10 2 6 2 4 4C2 6 2 10 4 12C6 14 10 16 12 18C14 16 18 14 20 12C22 10 22 6 20 4C18 2 14 2 12 4Z" fill="#722F37" />
+    <path d="M12 7C11 6 9 6 8 7C7 8 7 10 8 11C9 12 11 13 12 14" stroke="#C5A059" strokeWidth="1" strokeLinecap="round" />
+    <path d="M12 18V22M12 22C12 22 10 21 8 20M12 22C12 22 14 21 16 20" stroke="#2D4F1E" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 
 export const TulipIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
-     <path d="M12 2C9 2 6 4 6 8V12C6 15 9 17 12 17C15 17 18 15 18 12V8C18 4 15 2 12 2Z" opacity="0.8"/>
-     <path d="M12 17V22M8 22H16M12 17C10 19 8 19 6 18M12 17C14 19 16 19 18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+  <svg viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 16C15 16 18 13 18 9C18 5 15 2 12 2C9 2 6 5 6 9C6 13 9 16 12 16Z" fill="#FF8FAB" />
+    <path d="M12 2V16M6 9C6 9 8 7 12 7M18 9C18 9 16 7 12 7" stroke="#E14D68" strokeWidth="1" strokeLinecap="round" />
+    <path d="M12 16V22M12 18C10 18 7 19 6 21M12 19C14 19 17 18 18 20" stroke="#2D4F1E" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const BlueElement: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2L14 10H22L15 15L17 23L12 18L7 23L9 15L2 10H10L12 2Z" fill="#0B1026" stroke="#4A90E2" strokeWidth="1" />
+    <circle cx="12" cy="12" r="3" fill="#4A90E2" fillOpacity="0.3" />
   </svg>
 );
