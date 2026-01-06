@@ -132,103 +132,12 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
           </div>
         </div>
 
-        {/* Grid Content */}
-        <div className="p-6 sm:p-10 relative z-40">
-          {/* New Vision Gallery */}
-          <div className="mb-16">
-            <div className="flex items-center gap-4 mb-8 justify-center">
-              <div className="h-[1px] w-12 bg-garden-pink/30"></div>
-              <h3 className="font-display font-bold text-2xl text-garden-pink tracking-widest uppercase">Visual Stream</h3>
-              <div className="h-[1px] w-12 bg-garden-pink/30"></div>
-            </div>
+        {/* Content */}
+        <div className="p-6 sm:p-10 relative z-40 flex flex-col items-center justify-center min-h-[600px]">
+          {images.length > 0 ? (
             <VisionGallery images={images} />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
-            {images.map((img, idx) => (
-              <motion.div
-                key={img.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                whileHover={{ y: -10 }}
-                onHoverStart={() => setHoveredIndex(idx)}
-                onHoverEnd={() => setHoveredIndex(null)}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 200, 
-                  damping: 15,
-                  delay: (idx % 3) * 0.1 
-                }}
-                className="group relative"
-              >
-                {/* Visual Accent - Refined Gold/Pink mix */}
-                <div className="absolute -inset-1 bg-gradient-to-br from-garden-pink/20 to-spy-gold/20 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-[2rem] blur-xl" />
-                
-                <div className="relative aspect-[4/5] bg-spy-dark rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl transition-all duration-500 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.6)] group-hover:border-garden-pink/20">
-                  {/* Internal Technical HUD - only shows on hover */}
-                  <AnimatePresence>
-                    {hoveredIndex === idx && (
-                      <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="absolute inset-0 z-20 pointer-events-none"
-                      >
-                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-garden-pink/5 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-spy-gold/5 to-transparent" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Image with Zoom */}
-                  <img 
-                    src={img.thumbnailUrl} 
-                    alt={img.name}
-                    className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1 filter group-hover:brightness-110"
-                  />
-                  
-                  {/* Cute Info Card Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-spy-dark via-spy-dark/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 p-8 flex flex-col justify-end">
-                    <div className="space-y-4 translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="w-2 h-6 bg-garden-pink rounded-full shadow-[0_0_10px_rgba(255,183,197,0.5)]" />
-                          <h4 className="font-display font-black text-xl text-white tracking-wide uppercase leading-none">
-                            {img.name}
-                          </h4>
-                        </div>
-                        <div className="p-2 bg-white/10 rounded-full backdrop-blur-md">
-                          <Search className="w-4 h-4 text-white" />
-                        </div>
-                      </div>
-                      
-                      <div className="bg-black/60 p-4 rounded-2xl border border-white/5 backdrop-blur-md">
-                        <p className="text-sm font-hand text-garden-pink/90 leading-relaxed italic line-clamp-2">
-                          "{img.description}"
-                        </p>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-2">
-                        <div className="flex flex-col">
-                          <span className="text-[8px] font-mono text-white/30 tracking-[0.2em]">INTEL_DATE</span>
-                          <span className="text-[10px] font-mono text-garden-pink/60">{new Date(img.timestamp).toLocaleDateString()}</span>
-                        </div>
-                        <div className="px-4 py-1.5 bg-black/40 border border-garden-pink/20 rounded-full text-[9px] font-mono font-bold tracking-widest text-garden-pink/80">
-                          GUEST
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Aesthetic Corner Accents */}
-                  <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-white/10 rounded-tl-xl group-hover:border-garden-pink/30 transition-colors" />
-                  <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-white/10 rounded-br-xl group-hover:border-garden-pink/30 transition-colors" />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {images.length === 0 && (
-            <div className="py-32 flex flex-col items-center justify-center text-center">
+          ) : (
+            <div className="py-32 flex flex-col items-center justify-center text-center w-full">
               <motion.div 
                 animate={{ scale: [1, 1.1, 1], rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity }}
