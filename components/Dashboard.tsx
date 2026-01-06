@@ -446,13 +446,14 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                         className="relative max-w-5xl max-h-screen"
                         onClick={(e) => e.stopPropagation()}
                     >
-                         {/* High Res Image */}
-                        <div className="relative group overflow-hidden flex items-center justify-center">
+                        {/* High Res Image */}
+                        <div className="relative group overflow-hidden flex items-center justify-center min-h-[200px] w-full bg-spy-dark/50">
                             <img 
                                 src={selectedImage.url} 
                                 alt="High Res" 
-                                className="max-h-[85vh] w-auto border-2 border-spy-gold/30 shadow-[0_0_50px_rgba(197,160,89,0.2)] object-contain"
+                                className="max-h-[85vh] w-auto border-2 border-spy-gold/30 shadow-[0_0_50px_rgba(197,160,89,0.2)] object-contain transition-opacity duration-300"
                                 onLoad={(e) => {
+                                  e.currentTarget.style.opacity = '1';
                                   const img = e.currentTarget;
                                   if (img.naturalWidth < 10 && img.src.startsWith('blob:')) {
                                     console.error("Blob image seems corrupted or empty");
@@ -466,6 +467,10 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                                   }
                                 }}
                             />
+                            {/* Loading Spinner for Image */}
+                            <div className="absolute inset-0 -z-10 flex items-center justify-center">
+                                <div className="w-10 h-10 border-4 border-spy-gold/20 border-t-spy-gold rounded-full animate-spin"></div>
+                            </div>
                             {/* Overlay Indikator HD */}
                             <div className="absolute top-4 left-4 bg-spy-red/80 px-2 py-1 border border-spy-gold/50 rounded flex items-center gap-1.5 shadow-lg pointer-events-none">
                                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>

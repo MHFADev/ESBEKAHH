@@ -42,7 +42,15 @@ class APIService {
 
   async getImages(): Promise<ArchiveImage[]> {
     const result = await this.fetchAPI('get-images');
-    return result.images || [];
+    const images = result.images || [];
+    
+    // Ensure that for the visitor, the 'url' (HD) is actually present
+    // If Supabase only returns certain fields, we might need to ensure the HD field is mapped
+    return images.map((img: any) => ({
+      ...img,
+      // If the backend returns a different field name for HD, map it here
+      url: img.url || img.originalData || img.thumbnailUrl 
+    }));
   }
 
   async getFullImage(id: string): Promise<string> {
