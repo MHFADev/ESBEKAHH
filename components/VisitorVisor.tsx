@@ -17,25 +17,26 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
       {/* Interactive Background Decorations */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
         <motion.img 
-          src={CHARACTERS.rose}
-          alt="Rose"
-          className="absolute -top-10 -left-10 w-48 opacity-20 mix-blend-screen"
+          src={CHARACTERS.anya_peace}
+          alt="Anya"
+          className="absolute -top-10 -left-10 w-48 opacity-20"
           animate={{ 
-            rotate: 360,
-            scale: [1, 1.1, 1],
+            y: [0, -10, 0],
+            rotate: [-2, 2, -2]
           }}
           transition={{ 
-            rotate: { duration: 60, repeat: Infinity, ease: "linear" },
-            scale: { duration: 10, repeat: Infinity, ease: "easeInOut" }
+            duration: 6, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
           }}
         />
         <motion.img 
-          src={CHARACTERS.tulips}
-          alt="Tulips"
-          className="absolute -bottom-10 -right-10 w-56 opacity-20 mix-blend-screen"
+          src={CHARACTERS.anya_bond}
+          alt="Anya Bond"
+          className="absolute -bottom-10 -right-10 w-56 opacity-20"
           animate={{ 
-            y: [0, -20, 0],
-            rotate: [0, 5, 0]
+            scale: [1, 1.05, 1],
+            rotate: [0, -3, 0]
           }}
           transition={{ 
             duration: 8, 
