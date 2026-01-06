@@ -124,7 +124,8 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
 
         // 1. COMPRESSION PROCESS
         const thumbnailData = await compressImageToBase64(selectedFile, 0.6, 400);
-        const originalData = await compressImageToBase64(selectedFile, 0.75, 1200);
+        // Meningkatkan kualitas dan resolusi untuk HD (kualitas 0.9, lebar 1920)
+        const originalData = await compressImageToBase64(selectedFile, 0.9, 1920);
 
         // 2. UPLOAD TO SUPABASE
         const uploadResponse = await apiService.uploadImage({
@@ -422,11 +423,18 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                         onClick={(e) => e.stopPropagation()}
                     >
                          {/* High Res Image */}
-                        <img 
-                            src={selectedImage.url} 
-                            alt="High Res" 
-                            className="max-h-[85vh] w-auto border-2 border-spy-gold/30 shadow-[0_0_50px_rgba(197,160,89,0.2)]"
-                        />
+                        <div className="relative group overflow-hidden flex items-center justify-center">
+                            <img 
+                                src={selectedImage.url} 
+                                alt="High Res" 
+                                className="max-h-[85vh] w-auto border-2 border-spy-gold/30 shadow-[0_0_50px_rgba(197,160,89,0.2)] object-contain"
+                            />
+                            {/* Overlay Indikator HD */}
+                            <div className="absolute top-4 left-4 bg-spy-red/80 px-2 py-1 border border-spy-gold/50 rounded flex items-center gap-1.5 shadow-lg pointer-events-none">
+                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                                <span className="font-mono text-[10px] text-spy-gold font-bold tracking-tighter">HD RESOLUTION</span>
+                            </div>
+                        </div>
                         <div className="bg-spy-dark/80 text-spy-cream p-4 mt-2 border-t border-spy-gold">
                             <h3 className="font-display text-2xl text-spy-gold">{selectedImage.name}</h3>
                             <div className="font-mono text-xs opacity-70 mb-2 flex items-center gap-2">
