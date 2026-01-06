@@ -1,7 +1,8 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArchiveImage } from '../types';
-import { PeanutIcon, ButterflyIcon, Star, Lock, Search } from './Icons';
+import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon } from './Icons';
+import { CHARACTERS } from '../constants';
 
 interface VisitorVisorProps {
   images: ArchiveImage[];
@@ -9,8 +10,41 @@ interface VisitorVisorProps {
 }
 
 const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   return (
     <div className="relative w-full max-w-7xl mx-auto mt-8 px-4">
+      {/* Interactive Background Decorations */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
+        <motion.img 
+          src={CHARACTERS.rose}
+          alt="Rose"
+          className="absolute -top-10 -left-10 w-48 opacity-20 mix-blend-screen"
+          animate={{ 
+            rotate: 360,
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ 
+            rotate: { duration: 60, repeat: Infinity, ease: "linear" },
+            scale: { duration: 10, repeat: Infinity, ease: "easeInOut" }
+          }}
+        />
+        <motion.img 
+          src={CHARACTERS.tulips}
+          alt="Tulips"
+          className="absolute -bottom-10 -right-10 w-56 opacity-20 mix-blend-screen"
+          animate={{ 
+            y: [0, -20, 0],
+            rotate: [0, 5, 0]
+          }}
+          transition={{ 
+            duration: 8, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
+          }}
+        />
+      </div>
+
       {/* HUD Elements */}
       <div className="absolute -top-10 left-4 flex items-center gap-4 text-garden-pink/50 font-mono text-[10px] tracking-[0.3em] uppercase">
         <div className="flex items-center gap-2 border border-garden-pink/20 px-3 py-1 rounded-full backdrop-blur-md">
@@ -81,52 +115,97 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
             {images.map((img, idx) => (
               <motion.div
                 key={img.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.05 }}
-                className="group relative"
+                initial={{ opacity: 0, scale: 0.9, rotateY: -20 }}
+                whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
+                whileHover={{ scale: 1.02, z: 50 }}
+                onHoverStart={() => setHoveredIndex(idx)}
+                onHoverEnd={() => setHoveredIndex(null)}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 300, 
+                  damping: 20,
+                  delay: idx * 0.05 
+                }}
+                className="group relative preserve-3d cursor-crosshair"
               >
-                {/* Frame Decoration */}
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-garden-pink/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl blur-sm" />
+                {/* 3D Reflection Effect */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl pointer-events-none" />
                 
-                <div className="relative aspect-[4/5] bg-spy-dark rounded-xl overflow-hidden border border-white/10 shadow-2xl">
+                {/* Frame Decoration */}
+                <div className="absolute -inset-1 bg-gradient-to-br from-garden-pink/40 via-transparent to-garden-rose/40 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-xl blur-md" />
+                
+                <div className="relative aspect-[4/5] bg-spy-dark rounded-xl overflow-hidden border border-white/10 shadow-2xl transition-transform duration-500 group-hover:shadow-[0_0_30px_rgba(255,183,197,0.3)]">
+                  {/* Scanning Bar for individual images */}
+                  <AnimatePresence>
+                    {hoveredIndex === idx && (
+                      <motion.div 
+                        initial={{ top: '0%' }}
+                        animate={{ top: '100%' }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                        className="absolute left-0 right-0 h-1 bg-garden-pink/40 z-20 shadow-[0_0_10px_rgba(255,183,197,0.8)]"
+                      />
+                    )}
+                  </AnimatePresence>
+
                   {/* Image with Advanced Hover */}
                   <img 
                     src={img.thumbnailUrl} 
                     alt={img.name}
-                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1"
+                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1 filter group-hover:brightness-110"
                   />
                   
-                  {/* HUD Overlay on Hover */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[2px] p-6 flex flex-col justify-end">
-                    <div className="absolute top-4 right-4 text-garden-pink/50">
-                      <Search className="w-5 h-5" />
+                  {/* Interactive Info Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 p-6 flex flex-col justify-end translate-y-4 group-hover:translate-y-0">
+                    <div className="absolute top-4 left-4 flex gap-1">
+                      {[1,2,3].map(i => (
+                        <motion.div 
+                          key={i}
+                          animate={{ opacity: [0.3, 1, 0.3] }}
+                          transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
+                          className="w-1 h-1 bg-garden-pink rounded-full"
+                        />
+                      ))}
                     </div>
                     
-                    <motion.div 
-                      initial={{ y: 20, opacity: 0 }}
-                      whileInView={{ y: 0, opacity: 1 }}
-                      className="space-y-2"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="w-1 h-4 bg-garden-pink rounded-full" />
-                        <h4 className="font-display font-bold text-lg text-white tracking-wide uppercase">{img.name}</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-1 h-4 bg-garden-pink rounded-full animate-pulse" />
+                          <h4 className="font-display font-bold text-lg text-white tracking-wider uppercase group-hover:text-garden-pink transition-colors">
+                            {img.name}
+                          </h4>
+                        </div>
+                        <Search className="w-4 h-4 text-garden-pink/50" />
                       </div>
-                      <p className="text-xs font-hand text-garden-pink/80 line-clamp-2 leading-relaxed italic">
-                        "{img.description}"
-                      </p>
-                      <div className="pt-4 flex items-center justify-between border-t border-white/10">
-                        <span className="text-[9px] font-mono text-white/40">{new Date(img.timestamp).toLocaleDateString()}</span>
-                        <div className="flex items-center gap-1 px-2 py-0.5 bg-garden-rose/20 border border-garden-rose/30 rounded text-[8px] font-mono text-garden-rose">
-                          SECURE
+                      
+                      <div className="bg-black/40 p-3 rounded border border-white/5 backdrop-blur-sm">
+                        <p className="text-xs font-hand text-garden-pink/90 leading-relaxed italic">
+                          "{img.description}"
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[8px] font-mono tracking-tighter">
+                        <div className="flex flex-col">
+                          <span className="text-white/30">TIMESTAMP</span>
+                          <span className="text-garden-pink/60">{new Date(img.timestamp).toLocaleString()}</span>
+                        </div>
+                        <div className="px-2 py-1 bg-white/5 border border-white/10 rounded flex items-center gap-1">
+                          <Lock className="w-2 h-2 text-garden-rose" />
+                          <span className="text-white/50">VERIFIED</span>
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   </div>
 
+                  {/* Technical Overlays */}
+                  <div className="absolute top-2 right-2 text-[8px] font-mono text-white/20 group-hover:text-garden-pink/40 transition-colors">
+                    ID: {img.id.slice(0, 8)}
+                  </div>
+                  
                   {/* Corner Accents */}
-                  <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-garden-pink/30 rounded-tl-xl" />
-                  <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-garden-pink/30 rounded-br-xl" />
+                  <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-garden-pink/30 rounded-tl-xl group-hover:border-garden-pink transition-colors" />
+                  <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-garden-pink/30 rounded-br-xl group-hover:border-garden-pink transition-colors" />
                 </div>
               </motion.div>
             ))}
