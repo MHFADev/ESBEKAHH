@@ -272,6 +272,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
       <main className="container mx-auto px-4 mt-12 relative">
         
         {!isReadOnly && (
+          <>
              <motion.img 
                 src={CHARACTERS.loid_action}
                 alt="Action"
@@ -279,6 +280,14 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                 initial={{ x: 100, opacity: 0 }}
                 animate={{ x: 0, opacity: 0.1 }}
              />
+             <motion.img 
+                src={CHARACTERS.anya_peace}
+                alt="Anya"
+                className="absolute bottom-10 left-10 w-[200px] opacity-20 pointer-events-none z-0"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 0.2 }}
+             />
+          </>
         )}
         
         <div className="mb-16 text-center relative z-10">
