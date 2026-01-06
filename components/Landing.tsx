@@ -51,7 +51,7 @@ const Landing: React.FC<LandingProps> = ({ onVisitorEntry, onMemberEntry }) => {
         <motion.img 
             src={CHARACTERS.anya_bond}
             alt="Bond"
-            className="absolute bottom-10 -left-20 h-[40%] object-contain z-0 opacity-80 mix-blend-screen pointer-events-none"
+            className="absolute bottom-10 -left-20 h-[40%] object-contain z-0 opacity-80 mix-blend-multiply pointer-events-none"
             animate={{ 
                 x: hoveredSide === 'visitor' ? 50 : 0,
                 rotate: hoveredSide === 'visitor' ? 5 : 0
