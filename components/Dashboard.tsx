@@ -125,8 +125,8 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
 
         // 1. COMPRESSION PROCESS
         const thumbnailData = await compressImageToBase64(selectedFile, 0.6, 400);
-        // Meningkatkan kualitas dan resolusi untuk HD (kualitas 0.9, lebar 1920)
-        const originalData = await compressImageToBase64(selectedFile, 0.9, 1920);
+        // Meningkatkan kualitas dan resolusi untuk HD (kualitas 0.85, lebar 1920) - 15% kompresi
+        const originalData = await compressImageToBase64(selectedFile, 0.85, 1920);
 
         // 2. UPLOAD TO SUPABASE
         let uploadResponse;
