@@ -52,13 +52,13 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
 
       {/* Cute HUD Elements */}
       <div className="absolute -top-8 left-6 right-6 flex items-center justify-between text-garden-pink/60 font-mono text-[9px] sm:text-[10px] tracking-[0.2em] uppercase">
-        <div className="flex items-center gap-3 border border-garden-pink/20 bg-black/60 px-4 py-1.5 rounded-full backdrop-blur-xl">
-          <span className="w-2 h-2 bg-spy-blue rounded-full animate-pulse shadow-[0_0_8px_rgba(74,144,226,0.8)]" />
-          VISOR: <span className="text-spy-blue">ACTIVE</span>
+        <div className="flex items-center gap-3 border border-garden-pink/20 bg-spy-dark/80 px-4 py-1.5 rounded-full backdrop-blur-xl">
+          <span className="w-2 h-2 bg-spy-gold rounded-full animate-pulse shadow-[0_0_8px_rgba(197,160,89,0.8)]" />
+          VISOR: <span className="text-spy-gold">ACTIVE</span>
         </div>
-        <div className="hidden sm:flex items-center gap-3 border border-garden-pink/20 bg-black/60 px-4 py-1.5 rounded-full backdrop-blur-xl">
+        <div className="hidden sm:flex items-center gap-3 border border-garden-pink/20 bg-spy-dark/80 px-4 py-1.5 rounded-full backdrop-blur-xl">
           <span className="w-2 h-2 bg-spy-red rounded-full animate-pulse shadow-[0_0_8px_rgba(114,47,55,0.8)]" />
-          STATUS: <span className="text-spy-red">CUTE</span>
+          STATUS: <span className="text-spy-red">SECURE</span>
         </div>
       </div>
 
@@ -66,42 +66,42 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-black/40 border-2 border-white/10 rounded-[2.5rem] overflow-hidden backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,0.8),0_0_40px_rgba(255,183,197,0.05)]"
+        className="relative bg-spy-dark/60 border-2 border-garden-pink/10 rounded-[2.5rem] overflow-hidden backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,0.8),0_0_40px_rgba(255,183,197,0.05)]"
       >
         {/* Scanning Line Effect */}
-        <div className="absolute inset-0 pointer-events-none z-30 opacity-30">
+        <div className="absolute inset-0 pointer-events-none z-30 opacity-20">
           <motion.div 
             animate={{ y: ['0%', '100%'] }}
             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="w-full h-1 bg-gradient-to-r from-transparent via-spy-blue to-transparent blur-[2px]"
+            className="w-full h-1 bg-gradient-to-r from-transparent via-garden-pink to-transparent blur-[2px]"
           />
         </div>
 
         {/* Header Area */}
-        <div className="p-6 sm:p-10 border-b border-white/5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 relative z-40 bg-gradient-to-b from-white/5 to-transparent">
+        <div className="p-6 sm:p-10 border-b border-white/5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 relative z-40 bg-gradient-to-b from-garden-pink/5 to-transparent">
           <div className="flex items-center gap-6 sm:gap-8 w-full lg:w-auto">
             <div className="relative group shrink-0">
-              <div className="absolute -inset-4 bg-garden-pink blur-2xl opacity-20 group-hover:opacity-40 transition-opacity rounded-full" />
+              <div className="absolute -inset-4 bg-garden-pink blur-2xl opacity-10 group-hover:opacity-30 transition-opacity rounded-full" />
               <motion.div 
                 whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-spy-dark border-2 border-garden-pink/40 flex items-center justify-center overflow-hidden shadow-2xl relative z-10"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-spy-dark border-2 border-garden-pink/30 flex items-center justify-center overflow-hidden shadow-2xl relative z-10"
               >
                 <PeanutIcon className="w-12 h-12 sm:w-16 sm:h-16 text-garden-pink animate-wiggle" />
               </motion.div>
             </div>
             <div className="flex-1">
               <h1 className="text-4xl sm:text-6xl font-display font-black text-white tracking-tighter flex flex-wrap items-center gap-x-4">
-                <span className="text-garden-pink drop-shadow-[0_0_15px_rgba(255,183,197,0.4)]">ANYA</span>
-                <span className="text-white/20">ARCHIVE</span>
+                <span className="text-garden-pink drop-shadow-[0_0_15px_rgba(255,183,197,0.3)]">ANYA</span>
+                <span className="text-spy-gold/40">ARCHIVE</span>
               </h1>
               <div className="flex flex-wrap items-center gap-3 mt-4">
-                <div className="px-4 py-1 bg-spy-blue/10 border border-spy-blue/30 rounded-full text-[10px] font-mono text-spy-blue tracking-widest font-bold">
-                  PROTOCOL: B.L.U.E
+                <div className="px-4 py-1 bg-garden-pink/5 border border-garden-pink/20 rounded-full text-[10px] font-mono text-garden-pink tracking-widest font-bold">
+                  PROTOCOL: A.N.Y.A
                 </div>
-                <div className="px-4 py-1 bg-spy-red/10 border border-spy-red/30 rounded-full text-[10px] font-mono text-spy-red tracking-widest font-bold">
+                <div className="px-4 py-1 bg-spy-red/5 border border-spy-red/20 rounded-full text-[10px] font-mono text-spy-red tracking-widest font-bold">
                   SECURITY: S.T.R.I.X
                 </div>
-                <div className="flex items-center gap-1.5 text-[10px] font-mono text-white/40">
+                <div className="flex items-center gap-1.5 text-[10px] font-mono text-spy-gold/60">
                   <Star className="w-3 h-3 fill-spy-gold text-spy-gold" />
                   STELLA RANK
                 </div>
@@ -110,16 +110,16 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
           </div>
 
           <div className="flex gap-4 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
-            <div className="bg-black/60 border border-white/10 p-5 rounded-3xl backdrop-blur-md min-w-[120px] shrink-0">
-              <div className="text-[10px] font-mono text-garden-pink/50 mb-1 tracking-widest">INTEL_FOUND</div>
+            <div className="bg-spy-dark/80 border border-garden-pink/10 p-5 rounded-3xl backdrop-blur-md min-w-[120px] shrink-0">
+              <div className="text-[10px] font-mono text-garden-pink/40 mb-1 tracking-widest">INTEL_FOUND</div>
               <div className="text-3xl font-display font-bold text-white flex items-center gap-2">
                 {images.length}
-                <span className="text-[10px] text-garden-pink font-mono opacity-50">PCS</span>
+                <span className="text-[10px] text-garden-pink/40 font-mono">PCS</span>
               </div>
             </div>
-            <div className="bg-spy-dark/80 border border-spy-blue/20 p-5 rounded-3xl backdrop-blur-md min-w-[120px] shrink-0">
-              <div className="text-[10px] font-mono text-spy-blue/50 mb-1 tracking-widest">MODE</div>
-              <div className="text-3xl font-display font-bold text-spy-blue">WAKU</div>
+            <div className="bg-spy-dark/80 border border-spy-gold/10 p-5 rounded-3xl backdrop-blur-md min-w-[120px] shrink-0">
+              <div className="text-[10px] font-mono text-spy-gold/40 mb-1 tracking-widest">MODE</div>
+              <div className="text-3xl font-display font-bold text-spy-gold">WAKU</div>
             </div>
           </div>
         </div>
@@ -143,10 +143,10 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
                 }}
                 className="group relative"
               >
-                {/* Visual Accent - Red/Blue mix */}
-                <div className={`absolute -inset-1 bg-gradient-to-br ${idx % 2 === 0 ? 'from-spy-blue/40' : 'from-spy-red/40'} to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-[2rem] blur-xl`} />
+                {/* Visual Accent - Refined Gold/Pink mix */}
+                <div className="absolute -inset-1 bg-gradient-to-br from-garden-pink/20 to-spy-gold/20 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-[2rem] blur-xl" />
                 
-                <div className="relative aspect-[4/5] bg-spy-dark rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl transition-all duration-500 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.6)] group-hover:border-white/20">
+                <div className="relative aspect-[4/5] bg-spy-dark rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl transition-all duration-500 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.6)] group-hover:border-garden-pink/20">
                   {/* Internal Technical HUD - only shows on hover */}
                   <AnimatePresence>
                     {hoveredIndex === idx && (
@@ -155,8 +155,8 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
                         animate={{ opacity: 1 }}
                         className="absolute inset-0 z-20 pointer-events-none"
                       >
-                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-spy-blue/10 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-spy-red/10 to-transparent" />
+                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-garden-pink/5 to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-spy-gold/5 to-transparent" />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -165,7 +165,7 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
                   <img 
                     src={img.thumbnailUrl} 
                     alt={img.name}
-                    className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1 filter group-hover:brightness-110 grayscale-[30%] group-hover:grayscale-0"
+                    className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1 filter group-hover:brightness-110"
                   />
                   
                   {/* Cute Info Card Overlay */}
@@ -173,7 +173,7 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
                     <div className="space-y-4 translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <span className={`w-2 h-6 ${idx % 2 === 0 ? 'bg-spy-blue' : 'bg-spy-red'} rounded-full shadow-[0_0_10px_currentColor]`} />
+                          <span className="w-2 h-6 bg-garden-pink rounded-full shadow-[0_0_10px_rgba(255,183,197,0.5)]" />
                           <h4 className="font-display font-black text-xl text-white tracking-wide uppercase leading-none">
                             {img.name}
                           </h4>
@@ -194,16 +194,16 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
                           <span className="text-[8px] font-mono text-white/30 tracking-[0.2em]">INTEL_DATE</span>
                           <span className="text-[10px] font-mono text-garden-pink/60">{new Date(img.timestamp).toLocaleDateString()}</span>
                         </div>
-                        <div className={`px-4 py-1.5 bg-black/40 border ${idx % 2 === 0 ? 'border-spy-blue/30 text-spy-blue' : 'border-spy-red/30 text-spy-red'} rounded-full text-[9px] font-mono font-bold tracking-widest`}>
-                          {idx % 2 === 0 ? 'B.L.U.E' : 'R.E.D'}
+                        <div className="px-4 py-1.5 bg-black/40 border border-garden-pink/20 rounded-full text-[9px] font-mono font-bold tracking-widest text-garden-pink/80">
+                          GUEST
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Aesthetic Corner Accents */}
-                  <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-white/10 rounded-tl-xl group-hover:border-garden-pink/50 transition-colors" />
-                  <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-white/10 rounded-br-xl group-hover:border-garden-pink/50 transition-colors" />
+                  <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-white/10 rounded-tl-xl group-hover:border-garden-pink/30 transition-colors" />
+                  <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-white/10 rounded-br-xl group-hover:border-garden-pink/30 transition-colors" />
                 </div>
               </motion.div>
             ))}
