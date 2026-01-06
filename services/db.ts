@@ -85,10 +85,24 @@ class SecureDatabase {
           const thumbBlob = await this.getFile(fileStore, `thumb_${arch.id}`);
           const origBlob = await this.getFile(fileStore, `orig_${arch.id}`);
 
+          let thumbnailUrl = '';
+          let url = '';
+
+          try {
+            if (thumbBlob && thumbBlob.size > 0) {
+              thumbnailUrl = URL.createObjectURL(thumbBlob);
+            }
+            if (origBlob && origBlob.size > 0) {
+              url = URL.createObjectURL(origBlob);
+            }
+          } catch (e) {
+            console.error("Error creating ObjectURL:", e);
+          }
+
           return {
             ...arch,
-            thumbnailUrl: thumbBlob ? URL.createObjectURL(thumbBlob) : '',
-            url: origBlob ? URL.createObjectURL(origBlob) : ''
+            thumbnailUrl: thumbnailUrl || arch.thumbnailUrl,
+            url: url || arch.url
           };
         }));
         

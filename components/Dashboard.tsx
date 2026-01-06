@@ -164,6 +164,12 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
           const blobOrig = await resOrig.blob();
           const resThumb = await fetch(thumbnailData);
           const blobThumb = await resThumb.blob();
+          
+          // Verify blob size/integrity before saving
+          if (blobOrig.size < 100) {
+            throw new Error("Generated original blob is too small/invalid");
+          }
+          
           await dbService.insertArchive(newImage, blobOrig, blobThumb);
         } catch (e) {
           console.error("Local storage failed:", e);
