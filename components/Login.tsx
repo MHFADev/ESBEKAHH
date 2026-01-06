@@ -62,8 +62,6 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBack }) => {
             <div className="text-center mb-8">
                 <div className="flex justify-center gap-6 mb-4">
                     <BlueElement className="w-8 h-8 opacity-50" />
-                    <RoseIcon className="w-10 h-10 animate-bounce" />
-                    <TulipIcon className="w-10 h-10 animate-bounce delay-100" />
                     <BlueElement className="w-8 h-8 opacity-50" />
                 </div>
                 <h1 className="text-3xl font-display font-bold text-spy-dark border-b-2 border-spy-dark pb-2 inline-block">

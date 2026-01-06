@@ -26,27 +26,6 @@ const Landing: React.FC<LandingProps> = ({ onVisitorEntry, onMemberEntry }) => {
         }}
         transition={{ duration: 0.5 }}
       >
-        {/* New Decorative Tulips */}
-        <motion.img 
-            src={CHARACTERS.tulips}
-            alt="Tulips Decoration"
-            className="absolute -top-10 -right-10 w-40 opacity-30 pointer-events-none mix-blend-screen"
-            animate={{ 
-                rotate: hoveredSide === 'visitor' ? [0, 5, -5, 0] : 0,
-                scale: hoveredSide === 'visitor' ? 1.1 : 1
-            }}
-            transition={{ repeat: Infinity, duration: 10 }}
-        />
-        <motion.img 
-            src={CHARACTERS.white_tulip}
-            alt="White Tulip"
-            className="absolute bottom-20 right-10 w-24 opacity-40 pointer-events-none mix-blend-screen"
-            animate={{ 
-                y: hoveredSide === 'visitor' ? [0, -10, 0] : 0
-            }}
-            transition={{ repeat: Infinity, duration: 4 }}
-        />
-        
         {/* Soft Pink Glow */}
         <motion.div 
           className="absolute inset-0 bg-garden-pink/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -127,27 +106,6 @@ const Landing: React.FC<LandingProps> = ({ onVisitorEntry, onMemberEntry }) => {
         {/* Deep Navy/Red Glow */}
         <motion.div 
           className="absolute inset-0 bg-gradient-to-b from-spy-navy/50 to-spy-red/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        />
-
-        {/* New Decorative Roses */}
-        <motion.img 
-            src={CHARACTERS.rose}
-            alt="Rose Decoration"
-            className="absolute top-10 left-10 w-32 opacity-20 pointer-events-none mix-blend-screen"
-            animate={{ 
-                rotate: hoveredSide === 'member' ? 360 : 0,
-                scale: hoveredSide === 'member' ? 1.2 : 1
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.img 
-            src={CHARACTERS.rose}
-            alt="Rose Decoration Lower"
-            className="absolute bottom-40 right-10 w-48 opacity-10 pointer-events-none mix-blend-screen rotate-45"
-            animate={{ 
-                scale: hoveredSide === 'member' ? [1, 1.1, 1] : 1
-            }}
-            transition={{ duration: 5, repeat: Infinity }}
         />
 
         {/* CHARACTER IMAGES */}
