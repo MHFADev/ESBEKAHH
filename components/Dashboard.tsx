@@ -166,7 +166,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
         {images.map((img) => (
           <motion.div
             key={img.id}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, rotate: 2 }}
             onClick={() => setSelectedImage(img)}
             className="aspect-square relative group cursor-pointer overflow-hidden rounded-lg border border-spy-red/20 bg-spy-dark"
           >
