@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Background from './components/Background';
-import InteractiveDecoration from './components/InteractiveDecoration';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Landing from './components/Landing';
 import { ViewState, ArchiveImage } from './types';
 import { dbService } from './services/db';
 import { apiService } from './services/api';
+import InteractiveDecoration from './components/InteractiveDecoration';
 
 export default function App() {
   const [view, setView] = useState<ViewState>('LANDING');
@@ -17,20 +17,37 @@ export default function App() {
 
   const loadImages = async () => {
     try {
-      const localData = await dbService.getAllArchives();
-      if (localData && localData.length > 0) setImages(localData);
+      // 1. Force fetch from API to get the most accurate state
       await apiService.initDatabase();
       const fetchedImages = await apiService.getImages();
-      if (fetchedImages && fetchedImages.length > 0) setImages(fetchedImages);
+      
+      if (fetchedImages && fetchedImages.length >= 0) {
+        setImages(fetchedImages);
+        
+        // 2. Sync Local DB with API data (Cleanup deleted ones locally)
+        const localData = await dbService.getAllArchives();
+        for (const localImg of localData) {
+          if (!fetchedImages.find(fi => fi.id === localImg.id)) {
+            await dbService.deleteArchive(localImg.id);
+          }
+        }
+      } else {
+        // Fallback to local if API is down
+        const localData = await dbService.getAllArchives();
+        setImages(localData);
+      }
     } catch (e) {
       console.error("Failed to load images:", e);
+      // Fallback
+      const localData = await dbService.getAllArchives();
+      setImages(localData);
     }
   };
 
   useEffect(() => {
     loadImages();
-    // Simple real-time sync (poll every 30s)
-    const interval = setInterval(loadImages, 30000);
+    // Real-time sync
+    const interval = setInterval(loadImages, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -42,8 +59,10 @@ export default function App() {
     });
   };
 
-  const handleDeleteImage = (id: string | number) => {
+  const handleDeleteImage = async (id: string | number) => {
     setImages(prev => prev.filter(img => img.id !== id));
+    // Final check sync
+    await loadImages();
   };
 
   const handleVisitorEntry = async () => {
