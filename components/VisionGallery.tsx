@@ -5,9 +5,10 @@ import { Search, Lock, Star } from './Icons';
 
 interface VisionGalleryProps {
   images: ArchiveImage[];
+  onImageSelect?: (img: ArchiveImage) => void;
 }
 
-const VisionGallery: React.FC<VisionGalleryProps> = ({ images }) => {
+const VisionGallery: React.FC<VisionGalleryProps> = ({ images, onImageSelect }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleDragEnd = (event: any, info: any) => {
@@ -26,14 +27,9 @@ const VisionGallery: React.FC<VisionGalleryProps> = ({ images }) => {
       <div className="relative w-full max-w-5xl h-full flex items-center justify-center">
         <AnimatePresence initial={false} mode="popLayout">
           {images.map((img, idx) => {
-            // Calculate relative position to active index
             let position = idx - activeIndex;
-            
-            // Handle wrapping for circular behavior
             if (position > 1) position = position - images.length;
             if (position < -1) position = position + images.length;
-
-            // Only render neighbors and active
             if (Math.abs(position) > 1) return null;
 
             return (
@@ -42,9 +38,10 @@ const VisionGallery: React.FC<VisionGalleryProps> = ({ images }) => {
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
                 onDragEnd={handleDragEnd}
+                onClick={() => position === 0 && onImageSelect?.(img)}
                 initial={false}
                 animate={{
-                  x: position * 300, // Distance between images
+                  x: position * 300,
                   scale: position === 0 ? 1 : 0.8,
                   opacity: position === 0 ? 1 : 0.4,
                   filter: position === 0 ? 'blur(0px)' : 'blur(4px)',
@@ -55,7 +52,7 @@ const VisionGallery: React.FC<VisionGalleryProps> = ({ images }) => {
                   stiffness: 300,
                   damping: 30,
                 }}
-                className="absolute w-[280px] sm:w-[400px] aspect-[4/5] cursor-grab active:cursor-grabbing"
+                className={`absolute w-[280px] sm:w-[400px] aspect-[4/5] ${position === 0 ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing'}`}
               >
                 <div className="relative w-full h-full rounded-[2.5rem] overflow-hidden border-2 border-white/10 bg-spy-dark shadow-2xl">
                   <img
@@ -64,7 +61,6 @@ const VisionGallery: React.FC<VisionGalleryProps> = ({ images }) => {
                     className="w-full h-full object-cover pointer-events-none"
                   />
                   
-                  {/* Overlay for active image */}
                   {position === 0 && (
                     <motion.div 
                       initial={{ opacity: 0, y: 20 }}
@@ -84,13 +80,12 @@ const VisionGallery: React.FC<VisionGalleryProps> = ({ images }) => {
                           <span className="text-[10px] font-mono text-garden-pink/60">{new Date(img.timestamp).toLocaleDateString()}</span>
                         </div>
                         <div className="px-3 py-1 bg-black/40 border border-garden-pink/20 rounded-full text-[9px] font-mono text-garden-pink/80">
-                          CENTERED
+                          VIEW_HD
                         </div>
                       </div>
                     </motion.div>
                   )}
                   
-                  {/* Glass tint for side images */}
                   {position !== 0 && (
                     <div className="absolute inset-0 bg-spy-dark/40 backdrop-blur-[2px]" />
                   )}
@@ -101,9 +96,8 @@ const VisionGallery: React.FC<VisionGalleryProps> = ({ images }) => {
         </AnimatePresence>
       </div>
       
-      {/* Decorative Accents */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-garden-pink/20 to-transparent" />
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-spy-gold/20 to-transparent" />
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-spy-red/20 to-transparent" />
     </div>
   );
 };

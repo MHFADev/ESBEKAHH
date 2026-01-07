@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArchiveImage } from '../types';
-import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon } from './Icons';
+import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon, Crosshair } from './Icons';
 import { CHARACTERS } from '../constants';
 import VisionGallery from './VisionGallery';
 
@@ -11,7 +11,7 @@ interface VisitorVisorProps {
 }
 
 const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [selectedImage, setSelectedImage] = useState<ArchiveImage | null>(null);
 
   return (
     <div className="relative w-full max-w-7xl mx-auto mt-4 px-4 sm:px-6">
@@ -54,8 +54,8 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
       {/* Cute HUD Elements */}
       <div className="absolute -top-8 left-6 right-6 flex items-center justify-between text-garden-pink/60 font-mono text-[9px] sm:text-[10px] tracking-[0.2em] uppercase">
         <div className="flex items-center gap-3 border border-garden-pink/20 bg-spy-dark/80 px-4 py-1.5 rounded-full backdrop-blur-xl">
-          <span className="w-2 h-2 bg-spy-gold rounded-full animate-pulse shadow-[0_0_8px_rgba(197,160,89,0.8)]" />
-          VISOR: <span className="text-spy-gold">ACTIVE</span>
+          <span className="w-2 h-2 bg-spy-red rounded-full animate-pulse shadow-[0_0_8px_rgba(114,47,55,0.8)]" />
+          VISOR: <span className="text-spy-red">ACTIVE</span>
         </div>
         <div className="hidden sm:flex items-center gap-3 border border-garden-pink/20 bg-spy-dark/80 px-4 py-1.5 rounded-full backdrop-blur-xl">
           <span className="w-2 h-2 bg-spy-red rounded-full animate-pulse shadow-[0_0_8px_rgba(114,47,55,0.8)]" />
@@ -92,15 +92,15 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <Star className="w-3 h-3 text-spy-gold fill-spy-gold" />
-                <span className="text-[10px] font-serif font-bold text-spy-gold tracking-[0.2em] uppercase whitespace-nowrap">
+                <Star className="w-3 h-3 text-spy-red fill-spy-red" />
+                <span className="text-[10px] font-serif font-bold text-spy-red tracking-[0.2em] uppercase whitespace-nowrap">
                   Anak Kesayangan Bu Retno
                 </span>
-                <Star className="w-3 h-3 text-spy-gold fill-spy-gold" />
+                <Star className="w-3 h-3 text-spy-red fill-spy-red" />
               </div>
               <h1 className="text-4xl sm:text-6xl font-display font-black text-white tracking-tighter flex flex-wrap items-center gap-x-4">
                 <span className="text-garden-pink drop-shadow-[0_0_15px_rgba(255,183,197,0.3)]">ESBEKAHH</span>
-                <span className="text-spy-gold/40">ARCHIVE</span>
+                <span className="text-white/20">ARCHIVE</span>
               </h1>
               <div className="flex flex-wrap items-center gap-3 mt-4">
                 <div className="px-4 py-1 bg-garden-pink/5 border border-garden-pink/20 rounded-full text-[10px] font-mono text-garden-pink tracking-widest font-bold">
@@ -109,8 +109,8 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
                 <div className="px-4 py-1 bg-spy-red/5 border border-spy-red/20 rounded-full text-[10px] font-mono text-spy-red tracking-widest font-bold">
                   SECURITY: S.T.R.I.X
                 </div>
-                <div className="flex items-center gap-1.5 text-[10px] font-mono text-spy-gold/60">
-                  <Star className="w-3 h-3 fill-spy-gold text-spy-gold" />
+                <div className="flex items-center gap-1.5 text-[10px] font-mono text-spy-red/60">
+                  <Star className="w-3 h-3 fill-spy-red text-spy-red" />
                   STELLA RANK
                 </div>
               </div>
@@ -125,9 +125,9 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
                 <span className="text-[10px] text-garden-pink/40 font-mono">PCS</span>
               </div>
             </div>
-            <div className="bg-spy-dark/80 border border-spy-gold/10 p-5 rounded-3xl backdrop-blur-md min-w-[120px] shrink-0">
-              <div className="text-[10px] font-mono text-spy-gold/40 mb-1 tracking-widest">MODE</div>
-              <div className="text-3xl font-display font-bold text-spy-gold">WAKU</div>
+            <div className="bg-spy-dark/80 border border-spy-red/10 p-5 rounded-3xl backdrop-blur-md min-w-[120px] shrink-0">
+              <div className="text-[10px] font-mono text-spy-red/40 mb-1 tracking-widest">MODE</div>
+              <div className="text-3xl font-display font-bold text-spy-red">WAKU</div>
             </div>
           </div>
         </div>
@@ -135,7 +135,7 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
         {/* Content */}
         <div className="p-6 sm:p-10 relative z-40 flex flex-col items-center justify-center min-h-[600px]">
           {images.length > 0 ? (
-            <VisionGallery images={images} />
+            <VisionGallery images={images} onImageSelect={setSelectedImage} />
           ) : (
             <div className="py-32 flex flex-col items-center justify-center text-center w-full">
               <motion.div 
@@ -150,6 +150,73 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
             </div>
           )}
         </div>
+
+        {/* Lightbox for Visitors */}
+        <AnimatePresence>
+            {selectedImage && (
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[500] flex items-center justify-center bg-black/95 p-4 backdrop-blur-3xl"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <div className="absolute top-6 right-6 z-[510] flex gap-4">
+                        <button className="text-white/50 hover:text-garden-pink transition-colors font-display text-2xl">CLOSE ×</button>
+                    </div>
+
+                    <motion.div 
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.9, opacity: 0 }}
+                        className="relative max-w-6xl w-full flex flex-col items-center"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="relative group overflow-hidden flex flex-col items-center justify-center w-full bg-white/10 rounded-lg shadow-[0_0_100px_rgba(255,183,197,0.2)] border border-garden-pink/20 backdrop-blur-md">
+                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-garden-pink to-transparent opacity-50"></div>
+                            
+                            <div className="relative p-2 md:p-4 w-full flex justify-center">
+                                <img 
+                                    src={selectedImage.url} 
+                                    alt="Anya's Secret" 
+                                    className="max-h-[75vh] w-auto border border-white/20 shadow-[0_0_60px_rgba(255,183,197,0.1)] object-contain transition-all duration-700 ease-out"
+                                />
+                                
+                                <div className="absolute top-8 left-8 w-8 h-8 border-t-2 border-l-2 border-garden-pink/40"></div>
+                                <div className="absolute top-8 right-8 w-8 h-8 border-t-2 border-r-2 border-garden-pink/40"></div>
+                                <div className="absolute bottom-8 left-8 w-8 h-8 border-b-2 border-l-2 border-garden-pink/40"></div>
+                                <div className="absolute bottom-8 right-8 w-8 h-8 border-b-2 border-r-2 border-garden-pink/40"></div>
+                            </div>
+                            
+                            <div className="w-full bg-gradient-to-t from-garden-pink/30 via-garden-pink/10 to-transparent p-8 pt-12 z-10 border-t border-garden-pink/10 mt-[-60px]">
+                                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-3">
+                                            <span className="w-2 h-2 bg-garden-pink animate-pulse rounded-full"></span>
+                                            <h4 className="text-white font-display text-3xl md:text-4xl tracking-[0.25em] drop-shadow-lg uppercase">
+                                                {selectedImage.name}
+                                            </h4>
+                                        </div>
+                                        <p className="text-white/90 font-hand text-xl md:text-2xl max-w-3xl leading-relaxed italic border-l-2 border-white/30 pl-4 py-1">
+                                            {selectedImage.description}
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
+                                        <div className="text-[9px] font-mono text-white/60 tracking-widest uppercase flex items-center gap-2">
+                                            ANYA_INTEL_ID: {selectedImage.id.toString().substring(0, 8)}...
+                                            <span className="w-1 h-1 bg-white/40 rounded-full"></span>
+                                            DATE: {new Date(selectedImage.timestamp).toLocaleDateString()}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-garden-pink to-transparent opacity-50"></div>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
 
         {/* Optimized Footer */}
         <div className="px-10 py-8 bg-gradient-to-t from-spy-dark to-transparent flex flex-col sm:flex-row justify-between items-center gap-6">

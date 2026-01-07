@@ -363,16 +363,16 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
             >
                 <div className="inline-block relative group cursor-pointer z-20">
                 <div className="absolute inset-0 bg-spy-red blur-lg opacity-20 group-hover:opacity-40 transition-opacity" />
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="relative bg-spy-dark border border-spy-red text-spy-red px-10 py-5 rounded-sm flex items-center gap-4 transition-all group-hover:bg-spy-red group-hover:text-spy-cream overflow-hidden shadow-2xl"
-                    >
-                        <div className="absolute top-0 right-0 p-1">
-                            <div className="w-2 h-2 bg-spy-red rounded-full animate-pulse"></div>
-                        </div>
-                        <Upload className="w-6 h-6" />
-                        <span className="font-display tracking-widest font-bold">ADD NEW INTEL</span>
-                    </button>
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="relative bg-spy-dark border border-spy-red text-spy-red px-10 py-5 rounded-sm flex items-center gap-4 transition-all group-hover:bg-spy-red group-hover:text-spy-cream overflow-hidden shadow-2xl"
+                >
+                    <div className="absolute top-0 right-0 p-1">
+                        <div className="w-2 h-2 bg-spy-red rounded-full animate-pulse"></div>
+                    </div>
+                    <Upload className="w-6 h-6" />
+                    <span className="font-display tracking-widest font-bold">ADD NEW INTEL</span>
+                </button>
                 </div>
             </motion.div>
           </>
