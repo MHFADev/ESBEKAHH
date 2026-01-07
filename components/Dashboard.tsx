@@ -6,6 +6,7 @@ import { CHARACTERS, DIRECTORY_PATH, DB_CONFIG } from '../constants';
 import { dbService } from '../services/db';
 import { apiService } from '../services/api';
 import VisitorVisor from './VisitorVisor';
+import VisionGallery from './VisionGallery';
 
 // --- UTILITY: IMAGE COMPRESSOR & BLOB CONVERTER ---
 const compressImageToBlob = (file: File, quality = 0.8, maxWidth = 800): Promise<Blob> => {
@@ -375,6 +376,44 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                 </button>
                 </div>
             </motion.div>
+
+            {/* Content */}
+            <div className="p-6 sm:p-10 relative z-40 flex flex-col items-center justify-center min-h-[600px]">
+              {images.length > 0 ? (
+                <div className="w-full flex flex-col items-center">
+                  <VisionGallery images={images} onImageSelect={setSelectedImage} />
+                  
+                  {/* Agent Intel Grid (Gallery Mode) */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-12 w-full max-w-7xl">
+                    {images.map((img) => (
+                      <motion.div
+                        key={img.id}
+                        whileHover={{ scale: 1.05 }}
+                        onClick={() => setSelectedImage(img)}
+                        className="aspect-square relative group cursor-pointer overflow-hidden rounded-lg border border-spy-red/20 bg-spy-dark"
+                      >
+                        <img src={img.thumbnailUrl || img.url} alt={img.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-spy-dark to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
+                          <p className="text-[10px] font-mono text-spy-red tracking-widest truncate">{img.name}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="py-32 flex flex-col items-center justify-center text-center w-full">
+                  <motion.div 
+                    animate={{ scale: [1, 1.1, 1], rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                    className="w-40 h-40 bg-white/5 rounded-full flex items-center justify-center mb-8 border border-white/10 shadow-[0_0_50px_rgba(239,68,68,0.1)]"
+                  >
+                    <Crosshair className="w-20 h-20 text-spy-red/20" />
+                  </motion.div>
+                  <h4 className="font-display text-4xl text-white/40 mb-4 tracking-tighter uppercase">ARCHIVE_EMPTY</h4>
+                  <p className="font-mono text-[10px] text-spy-red tracking-[0.4em] uppercase">Ready for mission data ingestion. Use "ADD NEW INTEL" above.</p>
+                </div>
+              )}
+            </div>
           </>
         )}
 
