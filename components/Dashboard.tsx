@@ -98,6 +98,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
   
   // State
   const [isUploading, setIsUploading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,82 +113,45 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!previewUrl || !selectedFile) return;
+    if (!selectedImage) return;
 
-    setIsUploading(true);
-
+    setIsEditing(true);
     try {
-        const safeName = newTitle.toLowerCase().replace(/[^a-z0-9]/g, '_') || 'evidence';
-        const ext = selectedFile.name.split('.').pop() || 'jpg';
-        const finalFileName = `${safeName}_${Date.now()}.${ext}`;
+      await apiService.updateImage(selectedImage.id, {
+        name: newTitle,
+        description: newDesc,
+      });
 
-        // 1. COMPRESSION PROCESS
-        const thumbnailData = await compressImageToBase64(selectedFile, 0.6, 400);
-        // Meningkatkan kualitas dan resolusi untuk HD (kualitas 0.85, lebar 1920) - 15% kompresi
-        const originalData = await compressImageToBase64(selectedFile, 0.85, 1920);
-
-        // 2. UPLOAD TO SUPABASE
-        let uploadResponse;
-        try {
-          uploadResponse = await apiService.uploadImage({
-            name: newTitle || `INTEL_REC_${Math.floor(Math.random() * 1000)}`,
-            description: newDesc || 'No additional intelligence provided.',
-            fileName: finalFileName,
-            clearanceLevel: 'TOP SECRET',
-            thumbnailData,
-            originalData,
-            uploaderId: agentId
-          });
-        } catch (e) {
-          console.warn("Supabase upload failed, falling back to local IDB:", e);
-          uploadResponse = { success: true, id: `local_${Date.now()}` };
-        }
-
-        // 3. CREATE LOCAL IMAGE OBJECT
-        const newImage: ArchiveImage = {
-          id: uploadResponse.id,
-          url: originalData,
-          thumbnailUrl: thumbnailData,
-          timestamp: new Date().toISOString(),
-          clearanceLevel: 'TOP SECRET',
-          name: newTitle || `INTEL_REC_${Math.floor(Math.random() * 1000)}`,
-          description: newDesc || 'No additional intelligence provided.',
-          fileName: finalFileName,
-          virtualPath: DIRECTORY_PATH
-        };
-
-        // 4. PERSIST TO LOCAL IDB (Safety fallback)
-        try {
-          // Convert Base64 back to Blob for IndexedDB storage
-          const resOrig = await fetch(originalData);
-          const blobOrig = await resOrig.blob();
-          const resThumb = await fetch(thumbnailData);
-          const blobThumb = await resThumb.blob();
-          
-          // Verify blob size/integrity before saving
-          if (blobOrig.size < 100) {
-            throw new Error("Generated original blob is too small/invalid");
-          }
-          
-          await dbService.insertArchive(newImage, blobOrig, blobThumb);
-        } catch (e) {
-          console.error("Local storage failed:", e);
-        }
-
-        onAddImage(newImage);
-        closeModal();
-
+      // Update local state
+      const updatedImage = {
+        ...selectedImage,
+        name: newTitle,
+        description: newDesc,
+      };
+      
+      onAddImage(updatedImage);
+      setSelectedImage(updatedImage);
+      setIsModalOpen(false);
     } catch (error) {
-        console.error("Upload failed:", error);
-        alert("Mission Failed: Could not save intel to archives.");
-        setIsUploading(false);
+      console.error("Update failed:", error);
+      alert("Mission Failed: Could not update intel.");
+    } finally {
+      setIsEditing(false);
     }
+  };
+
+  const openEditModal = (img: ArchiveImage) => {
+    setSelectedImage(img);
+    setNewTitle(img.name);
+    setNewDesc(img.description || '');
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsUploading(false);
+    setIsEditing(false);
     setIsModalOpen(false);
     setNewTitle('');
     setNewDesc('');
@@ -370,23 +334,25 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
 
                         {/* Standard Form with Loader Overlay */}
                         <div className="relative">
-                            {isUploading && (
+                            {(isUploading || isEditing) && (
                                 <div className="absolute inset-0 z-50 bg-white/80 flex flex-col items-center justify-center backdrop-blur-sm">
                                     <div className="w-16 h-16 border-4 border-spy-dark border-t-spy-red rounded-full animate-spin mb-4"></div>
-                                    <p className="font-display font-bold text-spy-dark animate-pulse">ENCRYPTING & UPLOADING...</p>
+                                    <p className="font-display font-bold text-spy-dark animate-pulse">
+                                        {isUploading ? 'ENCRYPTING & UPLOADING...' : 'UPDATING ARCHIVES...'}
+                                    </p>
                                     <p className="font-mono text-xs text-spy-red mt-2">DO NOT CLOSE</p>
                                 </div>
                             )}
 
-                            <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                            <form onSubmit={selectedFile ? handleSubmit : handleEditSubmit} className="p-8 space-y-6">
                                 <div className="flex gap-8">
                                     <div className="w-1/3 flex flex-col gap-2">
                                         <div 
-                                            onClick={() => !isUploading && fileInputRef.current?.click()}
-                                            className="aspect-[3/4] border-2 border-dashed border-spy-dark/30 hover:border-spy-red cursor-pointer flex flex-col items-center justify-center bg-white/50 relative overflow-hidden group transition-all"
+                                            onClick={() => !isUploading && !isEditing && !selectedImage && fileInputRef.current?.click()}
+                                            className={`aspect-[3/4] border-2 border-dashed border-spy-dark/30 hover:border-spy-red cursor-pointer flex flex-col items-center justify-center bg-white/50 relative overflow-hidden group transition-all ${selectedImage ? 'cursor-default' : ''}`}
                                         >
-                                            {previewUrl ? (
-                                                <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                                            {previewUrl || (selectedImage && selectedImage.url) ? (
+                                                <img src={previewUrl || selectedImage?.url} alt="Preview" className="w-full h-full object-cover" />
                                             ) : (
                                                 <>
                                                     <Upload className="w-8 h-8 text-spy-dark/30 group-hover:text-spy-red mb-2 transition-colors" />
@@ -394,7 +360,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                                                 </>
                                             )}
                                         </div>
-                                        <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" accept="image/*" disabled={isUploading} />
+                                        <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" accept="image/*" disabled={isUploading || isEditing} />
                                     </div>
                                     <div className="flex-1 space-y-4">
                                         <div className="space-y-1">
@@ -402,7 +368,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                                             <input 
                                                 type="text" 
                                                 required
-                                                disabled={isUploading}
+                                                disabled={isUploading || isEditing}
                                                 value={newTitle}
                                                 onChange={(e) => setNewTitle(e.target.value)}
                                                 className="w-full bg-white border-2 border-spy-dark px-3 py-2 font-mono text-spy-dark outline-none shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-y-[1px] focus:shadow-[1px_1px_0px_rgba(0,0,0,1)] transition-all"
@@ -414,7 +380,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                                             <textarea 
                                                 required
                                                 rows={4}
-                                                disabled={isUploading}
+                                                disabled={isUploading || isEditing}
                                                 value={newDesc}
                                                 onChange={(e) => setNewDesc(e.target.value)}
                                                 className="w-full bg-white border-2 border-spy-dark px-3 py-2 font-hand text-xl font-bold text-spy-dark outline-none shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-y-[1px] focus:shadow-[1px_1px_0px_rgba(0,0,0,1)] transition-all"
@@ -430,10 +396,10 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                                 <div className="flex justify-end pt-4 border-t border-spy-dark/10">
                                     <button 
                                         type="submit"
-                                        disabled={!previewUrl || isUploading}
+                                        disabled={(!previewUrl && !selectedImage) || isUploading || isEditing}
                                         className="bg-spy-dark text-spy-cream px-8 py-3 font-display font-bold tracking-widest hover:bg-spy-red disabled:opacity-50 disabled:cursor-not-allowed shadow-[4px_4px_0px_rgba(197,160,89,1)] hover:translate-y-1 transition-all active:translate-y-1 active:shadow-none"
                                     >
-                                        {isUploading ? 'TRANSMITTING...' : 'UPLOAD TO DB'}
+                                        {isUploading || isEditing ? 'TRANSMITTING...' : (selectedImage ? 'UPDATE INTEL' : 'UPLOAD TO DB')}
                                     </button>
                                 </div>
                             </form>
@@ -445,7 +411,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
 
         {/* LIGHTBOX / FULL RES VIEWER */}
         <AnimatePresence>
-            {selectedImage && (
+            {selectedImage && !isModalOpen && (
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -453,7 +419,18 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                     className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 p-4 backdrop-blur-xl"
                     onClick={() => setSelectedImage(null)}
                 >
-                    <div className="absolute top-4 right-4 z-[210]">
+                    <div className="absolute top-4 right-4 z-[210] flex gap-4">
+                        {!isReadOnly && (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditModal(selectedImage);
+                            }}
+                            className="bg-spy-gold text-spy-dark px-4 py-2 font-display font-bold text-sm hover:bg-white transition-colors flex items-center gap-2"
+                          >
+                            <Upload size={16} /> EDIT INTEL
+                          </button>
+                        )}
                         <button className="text-white hover:text-spy-red font-display text-xl">CLOSE X</button>
                     </div>
                     

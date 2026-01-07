@@ -53,6 +53,13 @@ class APIService {
     }));
   }
 
+  async updateImage(id: string, data: { name: string; description: string }): Promise<{ success: boolean }> {
+    return this.fetchAPI('update-image', {
+      method: 'POST',
+      body: JSON.stringify({ id, ...data }),
+    });
+  }
+
   async getFullImage(id: string): Promise<string> {
     const result = await this.fetchAPI(`get-image?id=${id}`);
     return result.url;
