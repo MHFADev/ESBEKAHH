@@ -1,7 +1,7 @@
 import React from 'react';
-import { Lock, Unlock, Upload, LogOut, Eye, Search, AlertTriangle, Star, Bomb, Crosshair } from 'lucide-react';
+import { Lock, Unlock, Upload, LogOut, Eye, Search, AlertTriangle, Star, Bomb, Crosshair, Trash2 } from 'lucide-react';
 
-export { Lock, Unlock, Upload, LogOut, Eye, Search, AlertTriangle, Star, Bomb, Crosshair };
+export { Lock, Unlock, Upload, LogOut, Eye, Search, AlertTriangle, Star, Bomb, Crosshair, Trash2 };
 
 export const PeanutIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">

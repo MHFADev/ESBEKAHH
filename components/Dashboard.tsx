@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Upload, Lock, Star, PeanutIcon, Crosshair, RoseIcon, TulipIcon, ButterflyIcon, Search, AlertTriangle, BlueElement } from './Icons';
+import { LogOut, Upload, Lock, Star, PeanutIcon, Crosshair, RoseIcon, TulipIcon, ButterflyIcon, Search, AlertTriangle, BlueElement, Trash2 } from './Icons';
 import { ArchiveImage } from '../types';
 import { CHARACTERS, DIRECTORY_PATH, DB_CONFIG } from '../constants';
 import { dbService } from '../services/db';
@@ -85,9 +85,10 @@ interface DashboardProps {
   onLogout: () => void;
   images: ArchiveImage[];
   onAddImage: (img: ArchiveImage) => void;
+  onDeleteImage?: (id: string | number) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLogout, images, onAddImage }) => {
+const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLogout, images, onAddImage, onDeleteImage }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ArchiveImage | null>(null);
   
@@ -100,6 +101,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
   // State
   const [isUploading, setIsUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,6 +142,29 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
       alert("Mission Failed: Could not update intel.");
     } finally {
       setIsEditing(false);
+    }
+  };
+
+  const handleDelete = async (imgId: string | number) => {
+    if (!window.confirm("ARE YOU SURE YOU WANT TO DESTROY THIS INTEL? THIS ACTION IS IRREVERSIBLE.")) return;
+    
+    setIsDeleting(true);
+    try {
+      // API request if available
+      if (apiService.deleteImage) {
+        await apiService.deleteImage(imgId);
+      }
+      
+      // Local DB cleanup
+      await dbService.deleteArchive(imgId);
+      
+      onDeleteImage?.(imgId);
+      setSelectedImage(null);
+    } catch (error) {
+      console.error("Deletion failed:", error);
+      alert("Mission Failed: Could not destroy intel.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -230,6 +255,29 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
     setSelectedFile(null);
     setPreviewUrl(null);
   };
+
+  // Performance Optimization: Memoize the image grid
+  const ImageGrid = useMemo(() => {
+    if (images.length === 0) return null;
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-12 w-full max-w-7xl">
+        {images.map((img) => (
+          <motion.div
+            key={img.id}
+            whileHover={{ scale: 1.05 }}
+            onClick={() => setSelectedImage(img)}
+            className="aspect-square relative group cursor-pointer overflow-hidden rounded-lg border border-spy-red/20 bg-spy-dark"
+          >
+            <img src={img.thumbnailUrl || img.url} alt={img.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all loading-lazy" />
+            <div className="absolute inset-0 bg-gradient-to-t from-spy-dark to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
+              <p className="text-[10px] font-mono text-spy-red tracking-widest truncate">{img.name}</p>
+              <p className="text-[8px] font-mono text-white/40">{new Date(img.timestamp).toLocaleDateString()}</p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    );
+  }, [images]);
 
   return (
     <div className="relative z-10 min-h-screen pb-20 overflow-x-hidden">
@@ -382,23 +430,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
               {images.length > 0 ? (
                 <div className="w-full flex flex-col items-center">
                   <VisionGallery images={images} onImageSelect={setSelectedImage} />
-                  
-                  {/* Agent Intel Grid (Gallery Mode) */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-12 w-full max-w-7xl">
-                    {images.map((img) => (
-                      <motion.div
-                        key={img.id}
-                        whileHover={{ scale: 1.05 }}
-                        onClick={() => setSelectedImage(img)}
-                        className="aspect-square relative group cursor-pointer overflow-hidden rounded-lg border border-spy-red/20 bg-spy-dark"
-                      >
-                        <img src={img.thumbnailUrl || img.url} alt={img.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-spy-dark to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
-                          <p className="text-[10px] font-mono text-spy-red tracking-widest truncate">{img.name}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                  {ImageGrid}
                 </div>
               ) : (
                 <div className="py-32 flex flex-col items-center justify-center text-center w-full">
@@ -531,15 +563,28 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                 >
                     <div className="absolute top-6 right-6 z-[210] flex gap-4">
                         {!isReadOnly && (
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openEditModal(selectedImage);
-                            }}
-                            className="bg-spy-red text-spy-cream px-6 py-2 font-display font-bold text-sm hover:bg-white hover:text-spy-red transition-all duration-300 flex items-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.3)] rounded-sm"
-                          >
-                            <Upload size={16} /> EDIT INTEL
-                          </button>
+                          <div className="flex gap-4">
+                            <button 
+                              disabled={isDeleting}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(selectedImage.id);
+                              }}
+                              className="bg-black/60 text-spy-red px-6 py-2 font-display font-bold text-sm hover:bg-spy-red hover:text-white transition-all duration-300 flex items-center gap-2 border border-spy-red shadow-[0_0_10px_rgba(239,68,68,0.3)] rounded-sm"
+                            >
+                              <Trash2 size={16} /> {isDeleting ? 'DESTROYING...' : 'DESTROY INTEL'}
+                            </button>
+                            <button 
+                              disabled={isDeleting}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditModal(selectedImage);
+                              }}
+                              className="bg-spy-red text-spy-cream px-6 py-2 font-display font-bold text-sm hover:bg-white hover:text-spy-red transition-all duration-300 flex items-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.3)] rounded-sm"
+                            >
+                              <Upload size={16} /> EDIT INTEL
+                            </button>
+                          </div>
                         )}
                         <button className="text-white/50 hover:text-spy-red transition-colors font-display text-2xl">CLOSE ×</button>
                     </div>

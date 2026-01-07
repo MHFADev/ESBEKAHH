@@ -53,10 +53,17 @@ class APIService {
     }));
   }
 
-  async updateImage(id: string, data: { name: string; description: string }): Promise<{ success: boolean }> {
+  async updateImage(id: string | number, data: { name: string; description: string }): Promise<{ success: boolean }> {
     return this.fetchAPI('update-image', {
       method: 'POST',
       body: JSON.stringify({ id, ...data }),
+    });
+  }
+
+  async deleteImage(id: string | number): Promise<{ success: boolean }> {
+    return this.fetchAPI('delete-image', {
+      method: 'POST',
+      body: JSON.stringify({ id }),
     });
   }
 
