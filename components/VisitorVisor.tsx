@@ -15,32 +15,32 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
 
   return (
     <div className="relative w-full max-w-7xl mx-auto mt-4 px-4 sm:px-6">
-      {/* Optimized Background Decorations - Minimal Particles to avoid lag */}
+      {/* Interactive Background Decorations */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
         <motion.img 
-          src={CHARACTERS.anya_peace}
-          alt="Anya"
-          className="absolute -top-10 -left-10 w-32 sm:w-48 opacity-20 filter drop-shadow-[0_0_15px_rgba(255,183,197,0.3)]"
+          src={CHARACTERS.rose}
+          alt="Rose"
+          className="absolute -top-10 -left-10 w-32 sm:w-48 opacity-20 filter drop-shadow-[0_0_15px_rgba(114,47,55,0.3)] mix-blend-screen"
           animate={{ 
             y: [0, -15, 0],
-            rotate: [-5, 5, -5]
+            rotate: [0, 360, 0]
           }}
           transition={{ 
-            duration: 8, 
+            duration: 20, 
             repeat: Infinity, 
-            ease: "easeInOut" 
+            ease: "linear" 
           }}
         />
         <motion.img 
-          src={CHARACTERS.anya_bond}
-          alt="Anya Bond"
-          className="absolute -bottom-10 -right-10 w-40 sm:w-56 opacity-20 filter drop-shadow-[0_0_20px_rgba(255,183,197,0.3)]"
+          src={CHARACTERS.rose}
+          alt="Rose"
+          className="absolute -bottom-10 -right-10 w-40 sm:w-56 opacity-20 filter drop-shadow-[0_0_20px_rgba(114,47,55,0.3)] mix-blend-screen rotate-45"
           animate={{ 
-            scale: [1, 1.05, 1],
-            rotate: [5, -5, 5]
+            scale: [1, 1.1, 1],
+            rotate: [45, 15, 45]
           }}
           transition={{ 
-            duration: 10, 
+            duration: 12, 
             repeat: Infinity, 
             ease: "easeInOut" 
           }}
