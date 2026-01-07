@@ -142,6 +142,77 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!previewUrl || !selectedFile) return;
+
+    setIsUploading(true);
+
+    try {
+        const safeName = newTitle.toLowerCase().replace(/[^a-z0-9]/g, '_') || 'evidence';
+        const ext = selectedFile.name.split('.').pop() || 'jpg';
+        const finalFileName = `${safeName}_${Date.now()}.${ext}`;
+
+        // 1. COMPRESSION PROCESS
+        const thumbnailData = await compressImageToBase64(selectedFile, 0.6, 400);
+        const originalData = await compressImageToBase64(selectedFile, 0.85, 1920);
+
+        // 2. UPLOAD TO SUPABASE
+        let uploadResponse;
+        try {
+          uploadResponse = await apiService.uploadImage({
+            name: newTitle || `INTEL_REC_${Math.floor(Math.random() * 1000)}`,
+            description: newDesc || 'No additional intelligence provided.',
+            fileName: finalFileName,
+            clearanceLevel: 'TOP SECRET',
+            thumbnailData,
+            originalData,
+            uploaderId: agentId
+          });
+        } catch (e) {
+          console.warn("Supabase upload failed, falling back to local IDB:", e);
+          uploadResponse = { success: true, id: `local_${Date.now()}` };
+        }
+
+        // 3. CREATE LOCAL IMAGE OBJECT
+        const newImage: ArchiveImage = {
+          id: uploadResponse.id,
+          url: originalData,
+          thumbnailUrl: thumbnailData,
+          timestamp: new Date().toISOString(),
+          clearanceLevel: 'TOP SECRET',
+          name: newTitle || `INTEL_REC_${Math.floor(Math.random() * 1000)}`,
+          description: newDesc || 'No additional intelligence provided.',
+          fileName: finalFileName,
+          virtualPath: DIRECTORY_PATH
+        };
+
+        // 4. PERSIST TO LOCAL IDB (Safety fallback)
+        try {
+          const resOrig = await fetch(originalData);
+          const blobOrig = await resOrig.blob();
+          const resThumb = await fetch(thumbnailData);
+          const blobThumb = await resThumb.blob();
+          
+          if (blobOrig.size < 100) {
+            throw new Error("Generated original blob is too small/invalid");
+          }
+          
+          await dbService.insertArchive(newImage, blobOrig, blobThumb);
+        } catch (e) {
+          console.error("Local storage failed:", e);
+        }
+
+        onAddImage(newImage);
+        closeModal();
+
+    } catch (error) {
+        console.error("Upload failed:", error);
+        alert("Mission Failed: Could not save intel to archives.");
+        setIsUploading(false);
+    }
+  };
+
   const openEditModal = (img: ArchiveImage) => {
     setSelectedImage(img);
     setNewTitle(img.name);
@@ -433,7 +504,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                         )}
                         <button className="text-white hover:text-spy-red font-display text-xl">CLOSE X</button>
                     </div>
-                    
+
                     <motion.div 
                         initial={{ scale: 0.8 }}
                         animate={{ scale: 1 }}
@@ -449,105 +520,19 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
                                 className="max-h-[85vh] w-auto border-2 border-spy-gold/30 shadow-[0_0_50px_rgba(197,160,89,0.2)] object-contain transition-opacity duration-300"
                                 onLoad={(e) => {
                                   e.currentTarget.style.opacity = '1';
-                                  const img = e.currentTarget;
-                                  if (img.naturalWidth < 10 && img.src.startsWith('blob:')) {
-                                    console.error("Blob image seems corrupted or empty");
-                                  }
                                 }}
                                 onError={(e) => {
                                   console.error("Image failed to load:", selectedImage.url);
-                                  // Fallback ke thumbnail jika original gagal
                                   if (selectedImage.thumbnailUrl && e.currentTarget.src !== selectedImage.thumbnailUrl) {
                                     e.currentTarget.src = selectedImage.thumbnailUrl;
                                   }
                                 }}
                             />
-                            {/* Loading Spinner for Image */}
-                            <div className="absolute inset-0 -z-10 flex items-center justify-center">
-                                <div className="w-10 h-10 border-4 border-spy-gold/20 border-t-spy-gold rounded-full animate-spin"></div>
-                            </div>
-                            {/* Overlay Indikator HD */}
-                            <div className="absolute top-4 left-4 bg-spy-red/80 px-2 py-1 border border-spy-gold/50 rounded flex items-center gap-1.5 shadow-lg pointer-events-none">
-                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                                <span className="font-mono text-[10px] text-spy-gold font-bold tracking-tighter">HD RESOLUTION</span>
-                            </div>
-                        </div>
-                        <div className="bg-spy-dark/80 text-spy-cream p-4 mt-2 border-t border-spy-gold">
-                            <h3 className="font-display text-2xl text-spy-gold">{selectedImage.name}</h3>
-                            <div className="font-mono text-xs opacity-70 mb-2 flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                                FETCHED FROM: {DB_CONFIG.dbName}.public.archives
-                            </div>
-                            <p className="font-serif italic">{selectedImage.description}</p>
                         </div>
                     </motion.div>
                 </motion.div>
             )}
         </AnimatePresence>
-
-        {/* Gallery Grid */}
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8 pb-20 z-10 relative">
-          <AnimatePresence>
-            {images.map((img, index) => (
-              <motion.div
-                key={img.id}
-                layoutId={img.id}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                onClick={() => setSelectedImage(img)}
-                className="break-inside-avoid relative group perspective-1000 cursor-pointer"
-              >
-                <div className={`relative overflow-hidden shadow-2xl transition-transform duration-500 group-hover:-translate-y-2 flex flex-col ${
-                    isReadOnly 
-                        ? 'bg-garden-light p-4 rotate-1 group-hover:rotate-0 rounded-sm' 
-                        : 'bg-spy-navy border border-spy-red/20 rounded-sm'
-                }`}>
-                  
-                  <div className="relative overflow-hidden shrink-0 aspect-[4/5] bg-black/20">
-                    {/* Display COMPRESSED THUMBNAIL in grid for speed */}
-                    <img 
-                        src={img.thumbnailUrl || img.url} 
-                        alt="Evidence" 
-                        className={`w-full h-full object-cover transition-all duration-700 ${
-                            isReadOnly ? 'grayscale-0 sepia-[0.3]' : 'grayscale contrast-125 brightness-75 group-hover:grayscale-0 group-hover:brightness-100'
-                        }`}
-                        loading="lazy"
-                    />
-                    
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center bg-black/40">
-                         <div className="flex flex-col items-center text-spy-cream">
-                            <Search className="w-10 h-10 mb-2" />
-                            <span className="font-mono text-xs tracking-widest bg-black/50 px-2 py-1">CLICK TO VIEW HD</span>
-                         </div>
-                    </div>
-                  </div>
-
-                  <div className={`pt-4 ${isReadOnly ? 'text-garden-tulip' : 'text-spy-gold'}`}>
-                      <div className="flex justify-between items-start mb-2">
-                        <span className={`block ${isReadOnly ? 'font-hand font-bold text-2xl' : 'font-mono text-xs tracking-widest uppercase'}`}>
-                            {img.name}
-                        </span>
-                        {isReadOnly ? <TulipIcon className="w-5 h-5" /> : <Lock className="w-3 h-3 text-spy-red mt-1" />}
-                      </div>
-                      
-                      <p className={`text-sm leading-tight ${
-                          isReadOnly 
-                            ? 'font-serif italic text-gray-600 border-t border-garden-pink/30 pt-2 mt-1' 
-                            : 'font-mono text-xs text-spy-cream/60 border-t border-spy-red/20 pt-2 mt-1'
-                      }`}>
-                          {img.description || (isReadOnly ? "Waku waku!" : "No intelligence details available.")}
-                      </p>
-
-                      <div className={`mt-3 pt-2 text-[8px] font-mono tracking-tight truncate opacity-70 border-t border-dashed ${isReadOnly ? 'border-garden-pink/30 text-garden-rose' : 'border-spy-gold/20 text-spy-gold/50'}`}>
-                          DB_PATH: {img.virtualPath}{img.fileName}
-                      </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
       </main>
     </div>
   );
