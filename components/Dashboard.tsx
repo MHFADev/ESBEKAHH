@@ -79,7 +79,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
             console.warn("Server deletion failed, continuing with local:", e);
           }
           await dbService.deleteArchive(imgId);
-          onDeleteImage?.(imgId);
+          if (onDeleteImage) { onDeleteImage(imgId); } else { window.location.reload(); }
           setSelectedImage(null);
         } catch (error) {
           console.error("Deletion failed:", error);
