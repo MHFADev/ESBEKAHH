@@ -40,10 +40,10 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
   }, []);
 
   const decorativeElements = useMemo(() => [
-    { id: 1, x: 10, y: 20, delay: 0, icon: <TulipIcon className="w-8 h-8 text-garden-pink/20" /> },
+    { id: 1, x: 10, y: 20, delay: 1, icon: <TulipIcon className="w-8 h-8 text-garden-pink/20" /> },
     { id: 2, x: 80, y: 15, delay: 2, icon: <ButterflyIcon className="w-10 h-10 text-garden-tulip/20" /> },
     { id: 3, x: 15, y: 70, delay: 4, icon: <PeanutIcon className="w-6 h-6 text-garden-pink/10" /> },
-    { id: 4, x: 85, y: 80, delay: 1, icon: <RoseIcon className="w-12 h-12 text-spy-red/10" /> },
+    { id: 4, x: 85, y: 80, delay: 5, icon: <RoseIcon className="w-12 h-12 text-spy-red/10" /> },
   ], []);
 
   return (

@@ -16,25 +16,25 @@ const Background: React.FC = () => {
   // Soft Pink Butterflies (Anya Side)
   const butterflies = Array.from({ length: 4 }).map((_, i) => ({
     id: `b-${i}`,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
+    x: Math.random() * 200,
+    y: Math.random() * 200,
     size: Math.random() * 20 + 15,
     duration: Math.random() * 20 + 15,
-    delay: Math.random() * 5,
+    delay: Math.random() * 9,
   }));
 
   // Deep Red Roses (Yor Side)
   const roses = Array.from({ length: 12 }).map((_, i) => ({
     id: `r-${i}`,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 35 + 20,
+    x: Math.random() * 150,
+    y: Math.random() * 150,
+    size: Math.random() * 30 + 20,
     duration: Math.random() * 25 + 20,
     delay: Math.random() * 10,
   }));
 
   // Soft Tulips (Garden Side)
-  const tulips = Array.from({ length: 4 }).map((_, i) => ({
+  const tulips = Array.from({ length: 7 }).map((_, i) => ({
     id: `t-${i}`,
     x: Math.random() * 100,
     y: Math.random() * 100,
@@ -44,7 +44,7 @@ const Background: React.FC = () => {
   }));
 
   // Blue Elements (Spy Side)
-  const blueElements = Array.from({ length: 3 }).map((_, i) => ({
+  const blueElements = Array.from({ length: 5 }).map((_, i) => ({
     id: `b-el-${i}`,
     x: Math.random() * 100,
     y: Math.random() * 100,
