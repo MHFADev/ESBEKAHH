@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Upload, Lock, Star, PeanutIcon, Crosshair, RoseIcon, TulipIcon, ButterflyIcon, Search, AlertTriangle, BlueElement, Trash2 } from './Icons';
+import { LogOut, Upload, Lock, Star, PeanutIcon, Crosshair, RoseIcon, TulipIcon, ButterflyIcon, Search, AlertTriangle, BlueElement, Trash2, WakuWakuIcon } from './Icons';
 import { ArchiveImage } from '../types';
 import { CHARACTERS, DIRECTORY_PATH, DB_CONFIG } from '../constants';
 import { dbService } from '../services/db';
@@ -202,8 +202,8 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
         }`}
       >
         <div className="flex items-center gap-4">
-          <div className={`w-12 h-12 rounded-full border flex items-center justify-center overflow-hidden ${isReadOnly ? 'bg-garden-pink' : 'bg-spy-dark border-spy-red'}`}>
-             {isReadOnly ? <PeanutIcon className="w-8 h-8" /> : <span className="font-display font-bold text-xl">{agentId}</span>}
+          <div className={`w-12 h-12 rounded-full border flex items-center justify-center overflow-hidden ${isReadOnly ? 'bg-spy-dark border-garden-pink/40' : 'bg-spy-dark border-spy-red'}`}>
+             {isReadOnly ? <WakuWakuIcon className="w-8 h-8 text-garden-pink animate-pulse" /> : <span className="font-display font-bold text-xl">{agentId}</span>}
           </div>
           <div>
             <h2 className={`font-display text-lg leading-none ${isReadOnly ? 'text-garden-pink' : 'text-spy-cream'}`}>{isReadOnly ? "ANYA'S ALBUM" : 'WISE ARCHIVES'}</h2>
