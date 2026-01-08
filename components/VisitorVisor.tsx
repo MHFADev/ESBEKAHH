@@ -108,8 +108,8 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
               className="relative shrink-0"
             >
               <div className="absolute -inset-4 bg-garden-pink blur-3xl opacity-20 animate-pulse" />
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[2rem] bg-spy-dark/80 border-2 border-garden-pink/40 flex items-center justify-center overflow-hidden shadow-2xl relative z-10 backdrop-blur-md">
-                <WakuWakuIcon className="w-14 h-14 sm:w-16 sm:h-16 text-garden-pink animate-pulse" />
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[2rem] bg-spy-dark/80 border-2 border-garden-pink/40 flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(255,183,197,0.3)] relative z-10 backdrop-blur-md">
+                <WakuWakuIcon className="w-14 h-14 sm:w-16 sm:h-16 text-garden-pink animate-pulse drop-shadow-[0_0_8px_rgba(255,183,197,0.8)]" />
               </div>
             </motion.div>
             
