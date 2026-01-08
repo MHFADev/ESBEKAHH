@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { ArchiveImage } from '../types';
-import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon, Crosshair, HehFace, WakuWakuIcon } from './Icons';
+import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon, Crosshair, WakuWakuIcon } from './Icons';
 import { CHARACTERS } from '../constants';
 import VisionGallery from './VisionGallery';
 
@@ -85,7 +85,7 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
           animate={{ x: 0, opacity: 1 }}
           className="hidden sm:flex items-center gap-3 border border-garden-pink/20 bg-spy-dark/90 px-5 py-2 rounded-full backdrop-blur-2xl shadow-xl"
         >
-          <HehFace className="w-4 h-4 text-garden-pink" />
+          <PeanutIcon className="w-4 h-4 text-garden-pink" />
           <span className="text-spy-red">ANYA_MODE</span>
         </motion.div>
       </div>
@@ -155,7 +155,7 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
               >
                 <div className="absolute inset-0 border-2 border-dashed border-garden-pink/20 rounded-full" />
                 <div className="absolute inset-4 flex items-center justify-center">
-                  <HehFace className="w-16 h-16 text-garden-pink/20" />
+                  <PeanutIcon className="w-16 h-16 text-garden-pink/20" />
                 </div>
               </motion.div>
               <h2 className="text-3xl font-display text-white/20 tracking-widest">ARCHIVE_EMPTY</h2>

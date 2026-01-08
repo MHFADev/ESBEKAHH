@@ -14,7 +14,6 @@ export {
 
 export * from './icons/PeanutIcon';
 export * from './icons/StellaStar';
-export * from './icons/HehFace';
 export * from './icons/PistolIcon';
 export * from './icons/ButterflyIcon';
 export * from './icons/RoseIcon';

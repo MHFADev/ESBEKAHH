@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { PeanutIcon, Crosshair, ButterflyIcon, RoseIcon, TulipIcon, BlueElement } from './Icons';
+import { Crosshair, ButterflyIcon, RoseIcon, TulipIcon, BlueElement } from './Icons';
 
 const Background: React.FC = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });

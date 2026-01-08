@@ -65,7 +65,6 @@ const InteractiveDecoration = () => {
   return (
     <>
       <MouseFollower />
-      {[...Array(4)].map((_, i) => <FloatingPeanut key={i} />)}
     </>
   );
 };
