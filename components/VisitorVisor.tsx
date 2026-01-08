@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { ArchiveImage } from '../types';
-import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon, Crosshair } from './Icons';
+import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon, Crosshair, HehFace } from './Icons';
 import { CHARACTERS } from '../constants';
 import VisionGallery from './VisionGallery';
 
@@ -10,237 +10,259 @@ interface VisitorVisorProps {
   agentId: string;
 }
 
+const FloatingElement = ({ children, delay = 0, duration = 10, x = 0, y = 0 }: any) => (
+  <motion.div
+    initial={{ x: `${x}vw`, y: `${y}vh`, opacity: 0 }}
+    animate={{ 
+      y: [`${y}vh`, `${y - 10}vh`, `${y}vh`],
+      opacity: [0.2, 0.5, 0.2],
+      rotate: [0, 10, -10, 0]
+    }}
+    transition={{ duration, repeat: Infinity, delay, ease: "easeInOut" }}
+    className="absolute pointer-events-none z-0"
+  >
+    {children}
+  </motion.div>
+);
+
 const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
   const [selectedImage, setSelectedImage] = useState<ArchiveImage | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+  useEffect(() => {
+    const handleMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight });
+    };
+    window.addEventListener('mousemove', handleMove);
+    return () => window.removeEventListener('mousemove', handleMove);
+  }, []);
+
+  const decorativeElements = useMemo(() => [
+    { id: 1, x: 10, y: 20, delay: 0, icon: <TulipIcon className="w-8 h-8 text-garden-pink/20" /> },
+    { id: 2, x: 80, y: 15, delay: 2, icon: <ButterflyIcon className="w-10 h-10 text-garden-tulip/20" /> },
+    { id: 3, x: 15, y: 70, delay: 4, icon: <PeanutIcon className="w-6 h-6 text-garden-pink/10" /> },
+    { id: 4, x: 85, y: 80, delay: 1, icon: <RoseIcon className="w-12 h-12 text-spy-red/10" /> },
+  ], []);
 
   return (
     <div className="relative w-full max-w-7xl mx-auto mt-4 px-4 sm:px-6">
+      {/* Progress Bar for Scroll */}
+      <motion.div 
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-garden-pink via-spy-red to-garden-pink z-[100] origin-left"
+        style={{ scaleX }}
+      />
+
       {/* Interactive Background Decorations */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-        <motion.img 
-          src={CHARACTERS.rose}
-          alt="Rose"
-          className="absolute -top-10 -left-10 w-32 sm:w-48 opacity-20 filter drop-shadow-[0_0_15px_rgba(114,47,55,0.3)] mix-blend-screen"
-          animate={{ 
-            y: [0, -15, 0],
-            rotate: [0, 360, 0]
-          }}
-          transition={{ 
-            duration: 20, 
-            repeat: Infinity, 
-            ease: "linear" 
-          }}
-        />
-        <motion.img 
-          src={CHARACTERS.rose}
-          alt="Rose"
-          className="absolute -bottom-10 -right-10 w-40 sm:w-56 opacity-20 filter drop-shadow-[0_0_20px_rgba(114,47,55,0.3)] mix-blend-screen rotate-45"
-          animate={{ 
-            scale: [1, 1.1, 1],
-            rotate: [45, 15, 45]
-          }}
-          transition={{ 
-            duration: 12, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
-          }}
-        />
+        {decorativeElements.map(el => (
+          <FloatingElement key={el.id} x={el.x} y={el.y} delay={el.delay}>
+            {el.icon}
+          </FloatingElement>
+        ))}
         
-        {/* Subtle Theme Accents */}
-        <div className="absolute top-1/4 right-10 w-32 h-32 bg-spy-blue/10 blur-[80px] rounded-full" />
-        <div className="absolute bottom-1/4 left-10 w-40 h-40 bg-spy-red/10 blur-[100px] rounded-full" />
+        <motion.div 
+          className="absolute inset-0 opacity-30"
+          animate={{ 
+            background: `radial-gradient(circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(255, 183, 197, 0.15) 0%, transparent 50%)`
+          }}
+        />
       </div>
 
       {/* Cute HUD Elements */}
-      <div className="absolute -top-8 left-6 right-6 flex items-center justify-between text-garden-pink/60 font-mono text-[9px] sm:text-[10px] tracking-[0.2em] uppercase">
-        <div className="flex items-center gap-3 border border-garden-pink/20 bg-spy-dark/80 px-4 py-1.5 rounded-full backdrop-blur-xl">
-          <span className="w-2 h-2 bg-spy-red rounded-full animate-pulse shadow-[0_0_8px_rgba(114,47,55,0.8)]" />
-          VISOR: <span className="text-spy-red">ACTIVE</span>
-        </div>
-        <div className="hidden sm:flex items-center gap-3 border border-garden-pink/20 bg-spy-dark/80 px-4 py-1.5 rounded-full backdrop-blur-xl">
-          <span className="w-2 h-2 bg-spy-red rounded-full animate-pulse shadow-[0_0_8px_rgba(114,47,55,0.8)]" />
-          STATUS: <span className="text-spy-red">SECURE</span>
-        </div>
+      <div className="absolute -top-10 left-6 right-6 flex items-center justify-between text-garden-pink/60 font-mono text-[10px] tracking-[0.3em] uppercase">
+        <motion.div 
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          className="flex items-center gap-3 border border-garden-pink/20 bg-spy-dark/90 px-5 py-2 rounded-full backdrop-blur-2xl shadow-xl"
+        >
+          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_12px_#22c55e]" />
+          WAKU_SYSTEM: <span className="text-white">ONLINE</span>
+        </motion.div>
+        <motion.div 
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          className="hidden sm:flex items-center gap-3 border border-garden-pink/20 bg-spy-dark/90 px-5 py-2 rounded-full backdrop-blur-2xl shadow-xl"
+        >
+          <HehFace className="w-4 h-4 text-garden-pink" />
+          <span className="text-spy-red">ANYA_MODE</span>
+        </motion.div>
       </div>
 
       {/* Main Visor Container */}
       <motion.div 
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative bg-spy-dark/60 border-2 border-garden-pink/10 rounded-[2.5rem] overflow-hidden backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,0.8),0_0_40px_rgba(255,183,197,0.05)]"
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="relative bg-spy-dark/40 border border-white/10 rounded-[3rem] overflow-hidden backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] group/visor"
       >
-        {/* Scanning Line Effect */}
-        <div className="absolute inset-0 pointer-events-none z-30 opacity-20">
-          <motion.div 
-            animate={{ y: ['0%', '100%'] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="w-full h-1 bg-gradient-to-r from-transparent via-garden-pink to-transparent blur-[2px]"
-          />
-        </div>
+        {/* Glass Reflection Effect */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none z-10" />
 
         {/* Header Area */}
-        <div className="p-6 sm:p-10 border-b border-white/5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 relative z-40 bg-gradient-to-b from-garden-pink/5 to-transparent">
-          <div className="flex items-center gap-6 sm:gap-8 w-full lg:w-auto">
-            <div className="relative group shrink-0">
-              <div className="absolute -inset-4 bg-garden-pink blur-2xl opacity-10 group-hover:opacity-30 transition-opacity rounded-full" />
-              <motion.div 
-                whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-spy-dark border-2 border-garden-pink/30 flex items-center justify-center overflow-hidden shadow-2xl relative z-10"
-              >
-                <PeanutIcon className="w-12 h-12 sm:w-16 sm:h-16 text-garden-pink animate-wiggle" />
-              </motion.div>
-            </div>
+        <div className="p-8 sm:p-12 border-b border-white/5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10 relative z-40 bg-gradient-to-br from-garden-pink/10 via-transparent to-spy-red/5">
+          <div className="flex items-center gap-8 w-full lg:w-auto">
+            <motion.div 
+              whileHover={{ scale: 1.1, rotate: 10 }}
+              className="relative shrink-0"
+            >
+              <div className="absolute -inset-4 bg-garden-pink blur-3xl opacity-20 animate-pulse" />
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[2rem] bg-spy-dark/80 border-2 border-garden-pink/40 flex items-center justify-center overflow-hidden shadow-2xl relative z-10 backdrop-blur-md">
+                <PeanutIcon className="w-14 h-14 sm:w-16 sm:h-16 text-garden-pink" />
+              </div>
+            </motion.div>
+            
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <Star className="w-3 h-3 text-spy-red fill-spy-red" />
-                <span className="text-[10px] font-serif font-bold text-spy-red tracking-[0.2em] uppercase whitespace-nowrap">
+              <div className="flex items-center gap-3 mb-2">
+                <Star className="w-4 h-4 text-spy-gold fill-spy-gold" />
+                <span className="text-xs font-serif font-bold text-spy-gold tracking-[0.4em] uppercase">
                   Anak Kesayangan Bu Retno
                 </span>
-                <Star className="w-3 h-3 text-spy-red fill-spy-red" />
               </div>
-              <h1 className="text-4xl sm:text-6xl font-display font-black text-white tracking-tighter flex flex-wrap items-center gap-x-4">
-                <span className="text-garden-pink drop-shadow-[0_0_15px_rgba(255,183,197,0.3)]">ESBEKAHH</span>
-                <span className="text-white/20">ARCHIVE</span>
+              <h1 className="text-5xl sm:text-7xl font-display font-black text-white tracking-tighter leading-tight">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-garden-pink to-white drop-shadow-2xl">ESBEKAHH</span>
+                <span className="block text-white/30 text-3xl sm:text-4xl tracking-[0.2em] mt-1 font-mono">ARCHIVE_V2</span>
               </h1>
-              <div className="flex flex-wrap items-center gap-3 mt-4">
-                <div className="px-4 py-1 bg-garden-pink/5 border border-garden-pink/20 rounded-full text-[10px] font-mono text-garden-pink tracking-widest font-bold">
-                  PROTOCOL: A.N.Y.A
-                </div>
-                <div className="px-4 py-1 bg-spy-red/5 border border-spy-red/20 rounded-full text-[10px] font-mono text-spy-red tracking-widest font-bold">
-                  SECURITY: S.T.R.I.X
-                </div>
-                <div className="flex items-center gap-1.5 text-[10px] font-mono text-spy-red/60">
-                  <Star className="w-3 h-3 fill-spy-red text-spy-red" />
-                  STELLA RANK
-                </div>
-              </div>
             </div>
           </div>
 
-          <div className="flex gap-4 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
-            <div className="bg-spy-dark/80 border border-garden-pink/10 p-5 rounded-3xl backdrop-blur-md min-w-[120px] shrink-0">
-              <div className="text-[10px] font-mono text-garden-pink/40 mb-1 tracking-widest">INTEL_FOUND</div>
-              <div className="text-3xl font-display font-bold text-white flex items-center gap-2">
+          <div className="flex gap-6 w-full lg:w-auto">
+            <div className="flex-1 lg:flex-none bg-white/5 border border-white/10 p-6 rounded-[2rem] backdrop-blur-xl group hover:border-garden-pink/40 transition-colors">
+              <div className="text-[10px] font-mono text-garden-pink/60 mb-2 tracking-[0.3em]">INTEL_COUNT</div>
+              <div className="text-4xl font-display font-bold text-white flex items-baseline gap-2">
                 {images.length}
-                <span className="text-[10px] text-garden-pink/40 font-mono">PCS</span>
+                <span className="text-xs text-white/30 font-mono">FILES</span>
               </div>
             </div>
-            <div className="bg-spy-dark/80 border border-spy-red/10 p-5 rounded-3xl backdrop-blur-md min-w-[120px] shrink-0">
-              <div className="text-[10px] font-mono text-spy-red/40 mb-1 tracking-widest">MODE</div>
-              <div className="text-3xl font-display font-bold text-spy-red">WAKU</div>
+            <div className="flex-1 lg:flex-none bg-white/5 border border-white/10 p-6 rounded-[2rem] backdrop-blur-xl group hover:border-spy-red/40 transition-colors text-center">
+              <div className="text-[10px] font-mono text-spy-red/60 mb-2 tracking-[0.3em]">THREAT_LVL</div>
+              <div className="text-4xl font-display font-bold text-spy-red">LOW</div>
             </div>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="p-6 sm:p-10 relative z-40 flex flex-col items-center justify-center min-h-[600px]">
+        {/* Content Section */}
+        <div className="p-8 sm:p-12 relative z-40 min-h-[500px]">
           {images.length > 0 ? (
             <VisionGallery images={images} onImageSelect={setSelectedImage} />
           ) : (
-            <div className="py-32 flex flex-col items-center justify-center text-center w-full">
+            <div className="py-40 flex flex-col items-center justify-center text-center">
               <motion.div 
-                animate={{ scale: [1, 1.1, 1], rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="w-40 h-40 bg-white/5 rounded-full flex items-center justify-center mb-8 border border-white/10 shadow-[0_0_50px_rgba(255,183,197,0.1)]"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="w-32 h-32 mb-8 relative"
               >
-                <ButterflyIcon className="w-20 h-20 text-garden-pink/20" />
+                <div className="absolute inset-0 border-2 border-dashed border-garden-pink/20 rounded-full" />
+                <div className="absolute inset-4 flex items-center justify-center">
+                  <HehFace className="w-16 h-16 text-garden-pink/20" />
+                </div>
               </motion.div>
-              <h4 className="font-display text-4xl text-white/40 mb-4 tracking-tighter">ARCHIVE_OFFLINE</h4>
-              <p className="font-mono text-[10px] text-spy-blue tracking-[0.4em] uppercase">Ready for mission data ingestion</p>
+              <h2 className="text-3xl font-display text-white/20 tracking-widest">ARCHIVE_EMPTY</h2>
+              <p className="mt-4 font-mono text-xs text-white/10 tracking-[0.5em] uppercase">Waiting for operation strix data</p>
             </div>
           )}
         </div>
 
-        {/* Lightbox for Visitors */}
-        <AnimatePresence>
-            {selectedImage && (
-                <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[500] flex items-center justify-center bg-black/95 p-4 backdrop-blur-3xl"
-                    onClick={() => setSelectedImage(null)}
-                >
-                    <div className="absolute top-6 right-6 z-[510] flex gap-4">
-                        <button className="text-white/50 hover:text-garden-pink transition-colors font-display text-2xl">CLOSE ×</button>
-                    </div>
-
-                    <motion.div 
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.9, opacity: 0 }}
-                        className="relative max-w-6xl w-full flex flex-col items-center"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="relative group overflow-hidden flex flex-col items-center justify-center w-full bg-white/10 rounded-lg shadow-[0_0_100px_rgba(255,183,197,0.2)] border border-garden-pink/20 backdrop-blur-md">
-                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-garden-pink to-transparent opacity-50"></div>
-                            
-                            <div className="relative p-2 md:p-4 w-full flex justify-center">
-                                <img 
-                                    src={selectedImage.url} 
-                                    alt="Anya's Secret" 
-                                    className="max-h-[75vh] w-auto border border-white/20 shadow-[0_0_60px_rgba(255,183,197,0.1)] object-contain transition-all duration-700 ease-out"
-                                />
-                                
-                                <div className="absolute top-8 left-8 w-8 h-8 border-t-2 border-l-2 border-garden-pink/40"></div>
-                                <div className="absolute top-8 right-8 w-8 h-8 border-t-2 border-r-2 border-garden-pink/40"></div>
-                                <div className="absolute bottom-8 left-8 w-8 h-8 border-b-2 border-l-2 border-garden-pink/40"></div>
-                                <div className="absolute bottom-8 right-8 w-8 h-8 border-b-2 border-r-2 border-garden-pink/40"></div>
-                            </div>
-                            
-                            <div className="w-full bg-gradient-to-t from-garden-pink/30 via-garden-pink/10 to-transparent p-8 pt-12 z-10 border-t border-garden-pink/10 mt-[-60px]">
-                                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-3">
-                                            <span className="w-2 h-2 bg-garden-pink animate-pulse rounded-full"></span>
-                                            <h4 className="text-white font-display text-3xl md:text-4xl tracking-[0.25em] drop-shadow-lg uppercase">
-                                                {selectedImage.name}
-                                            </h4>
-                                        </div>
-                                        <p className="text-white/90 font-hand text-xl md:text-2xl max-w-3xl leading-relaxed italic border-l-2 border-white/30 pl-4 py-1">
-                                            {selectedImage.description}
-                                        </p>
-                                    </div>
-                                    <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
-                                        <div className="text-[9px] font-mono text-white/60 tracking-widest uppercase flex items-center gap-2">
-                                            ANYA_INTEL_ID: {selectedImage.id.toString().substring(0, 8)}...
-                                            <span className="w-1 h-1 bg-white/40 rounded-full"></span>
-                                            DATE: {new Date(selectedImage.timestamp).toLocaleDateString()}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-garden-pink to-transparent opacity-50"></div>
-                        </div>
-                    </motion.div>
-                </motion.div>
-            )}
-        </AnimatePresence>
-
-        {/* Optimized Footer */}
-        <div className="px-10 py-8 bg-gradient-to-t from-spy-dark to-transparent flex flex-col sm:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-6">
+        {/* Footer Info */}
+        <div className="px-12 py-10 bg-black/20 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center gap-8 overflow-hidden">
             <div className="flex items-center gap-3">
-              <div className="w-2.5 h-2.5 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]" />
-              <span className="font-mono text-[10px] text-white/40 tracking-[0.2em] uppercase">SYSTEM_STABLE</span>
+              <div className="w-2 h-2 bg-spy-blue rounded-full shadow-[0_0_10px_#4a90e2]" />
+              <span className="font-mono text-[10px] text-white/40 tracking-[0.3em] uppercase">ULTRA_SMOOTH_RENDER</span>
             </div>
-            <div className="h-4 w-[1px] bg-white/10" />
+            <div className="hidden sm:block h-4 w-[1px] bg-white/10" />
             <div className="flex items-center gap-3">
-              <div className="w-2.5 h-2.5 bg-spy-blue rounded-full shadow-[0_0_10px_#4a90e2]" />
-              <span className="font-mono text-[10px] text-white/40 tracking-[0.2em] uppercase">LOW_LATENCY_MODE</span>
+              <span className="font-mono text-[10px] text-white/40 tracking-[0.3em] uppercase">PING: 1ms</span>
             </div>
           </div>
-          <div className="flex items-center gap-4 bg-white/5 px-6 py-2 rounded-full border border-white/10">
-            <span className="font-hand text-lg text-garden-pink">Powered by Peanuts</span>
-            <ButterflyIcon className="w-6 h-6 text-garden-pink/60" />
-          </div>
+          
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            className="flex items-center gap-4 bg-gradient-to-r from-garden-pink/20 to-spy-red/20 px-8 py-3 rounded-full border border-white/10 backdrop-blur-md cursor-help"
+          >
+            <span className="font-hand text-xl text-white">Heh.</span>
+            <ButterflyIcon className="w-6 h-6 text-garden-pink animate-pulse" />
+          </motion.div>
         </div>
       </motion.div>
 
-      {/* Static Glows - Lighter than particles */}
-      <div className="absolute -z-10 top-0 left-1/4 w-[40%] h-[40%] bg-spy-blue/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute -z-10 bottom-0 right-1/4 w-[40%] h-[40%] bg-spy-red/5 blur-[120px] rounded-full pointer-events-none" />
+      {/* Lightbox Enhancement */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/98 backdrop-blur-3xl p-4 md:p-8"
+            onClick={() => setSelectedImage(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative max-w-6xl w-full bg-spy-dark/80 rounded-[3rem] overflow-hidden border border-white/10 shadow-[0_0_150px_rgba(255,183,197,0.1)]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex flex-col lg:flex-row h-full max-h-[90vh]">
+                <div className="flex-1 bg-black/40 flex items-center justify-center p-4 min-h-[40vh] relative group">
+                  <img 
+                    src={selectedImage.url} 
+                    alt={selectedImage.name}
+                    className="max-h-full w-auto object-contain shadow-2xl rounded-xl transition-transform duration-500 group-hover:scale-[1.02]"
+                  />
+                  <button 
+                    onClick={() => setSelectedImage(null)}
+                    className="absolute top-6 left-6 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-garden-pink transition-colors z-50 lg:hidden"
+                  >
+                    ×
+                  </button>
+                </div>
+                
+                <div className="w-full lg:w-[400px] p-8 lg:p-12 flex flex-col justify-between bg-gradient-to-b from-white/5 to-transparent border-t lg:border-t-0 lg:border-l border-white/5 overflow-y-auto">
+                  <div>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-1 bg-garden-pink rounded-full" />
+                      <span className="font-mono text-[10px] text-garden-pink tracking-[0.4em] uppercase">CLASSIFIED_FILE</span>
+                    </div>
+                    
+                    <h2 className="text-4xl font-display font-black text-white mb-6 leading-tight tracking-tight uppercase">
+                      {selectedImage.name}
+                    </h2>
+                    
+                    <div className="space-y-6">
+                      <div>
+                        <div className="text-[10px] font-mono text-white/30 mb-2 tracking-widest uppercase">INTEL_DESCRIPTION</div>
+                        <p className="text-white/80 font-hand text-2xl leading-relaxed italic">
+                          "{selectedImage.description}"
+                        </p>
+                      </div>
+                      
+                      <div className="pt-6 border-t border-white/5 space-y-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-mono text-white/20 tracking-widest uppercase">TIMESTAMP</span>
+                          <span className="text-xs font-mono text-garden-pink">{new Date(selectedImage.timestamp).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-mono text-white/20 tracking-widest uppercase">FILE_ID</span>
+                          <span className="text-[10px] font-mono text-white/40">{selectedImage.id.toString().substring(0, 12)}...</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={() => setSelectedImage(null)}
+                    className="mt-12 w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-display text-lg tracking-widest hover:bg-white/10 hover:border-garden-pink/50 transition-all active:scale-95 hidden lg:block"
+                  >
+                    CLOSE_ARCHIVE
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
