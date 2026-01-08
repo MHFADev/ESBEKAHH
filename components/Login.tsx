@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, AlertTriangle, Star, HehFace, Bomb, RoseIcon, TulipIcon, BlueElement } from './Icons';
+import { Lock, AlertTriangle, Star, Bomb, RoseIcon, TulipIcon, BlueElement, PeanutIcon } from './Icons';
 import { ALLOWED_AGENTS, MASTER_KEY } from '../constants';
 
 interface LoginProps {
@@ -74,22 +74,22 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBack }) => {
 
             <AnimatePresence mode="wait">
                 {error ? (
-                     <motion.div
-                        key="error"
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="flex flex-col items-center justify-center mb-6"
-                     >
-                        <HehFace className="w-24 h-24 text-spy-dark mb-2" />
-                        <p className="font-hand text-xl text-spy-dark font-bold">Heh. Wrong Password.</p>
-                        <button 
-                            onClick={() => setError(false)}
-                            className="mt-2 text-xs underline text-spy-red hover:text-spy-dark"
+                        <motion.div
+                           key="error"
+                           initial={{ opacity: 0, scale: 0.5 }}
+                           animate={{ opacity: 1, scale: 1 }}
+                           exit={{ opacity: 0 }}
+                           className="flex flex-col items-center justify-center mb-6"
                         >
-                            TRY AGAIN
-                        </button>
-                     </motion.div>
+                           <PeanutIcon className="w-24 h-24 text-spy-dark mb-2" />
+                           <p className="font-hand text-xl text-spy-dark font-bold">Heh. Wrong Password.</p>
+                           <button 
+                               onClick={() => setError(false)}
+                               className="mt-2 text-xs underline text-spy-red hover:text-spy-dark"
+                           >
+                               TRY AGAIN
+                           </button>
+                        </motion.div>
                 ) : (
                     <motion.form 
                         key="form"
