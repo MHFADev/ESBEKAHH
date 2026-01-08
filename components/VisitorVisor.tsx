@@ -47,7 +47,7 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
   ], []);
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto mt-4 px-4 sm:px-6">
+    <div className="relative w-full max-w-7xl mx-auto pt-24 pb-12 px-4 sm:px-6">
       {/* Progress Bar for Scroll */}
       <motion.div 
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-garden-pink via-spy-red to-garden-pink z-[100] origin-left"
@@ -92,10 +92,10 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
 
       {/* Main Visor Container */}
       <motion.div 
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="relative bg-spy-dark/40 border border-white/10 rounded-[3rem] overflow-hidden backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] group/visor"
+        className="relative bg-spy-dark/60 border border-white/10 rounded-[3rem] overflow-hidden backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] group/visor z-10"
       >
         {/* Glass Reflection Effect */}
         <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none z-10" />

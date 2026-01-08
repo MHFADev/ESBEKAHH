@@ -24,11 +24,11 @@ const Background: React.FC = () => {
   }));
 
   // Deep Red Roses (Yor Side)
-  const roses = Array.from({ length: 4 }).map((_, i) => ({
+  const roses = Array.from({ length: 12 }).map((_, i) => ({
     id: `r-${i}`,
     x: Math.random() * 100,
     y: Math.random() * 100,
-    size: Math.random() * 25 + 10,
+    size: Math.random() * 35 + 20,
     duration: Math.random() * 25 + 20,
     delay: Math.random() * 10,
   }));
