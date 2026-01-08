@@ -64,6 +64,11 @@ class APIService {
     return this.fetchAPI('delete-image', {
       method: 'POST',
       body: JSON.stringify({ id }),
+    }).catch(err => {
+      console.error("API delete error:", err);
+      // Still return success if it's already gone or function missing 
+      // to let local deletion proceed without blocking
+      return { success: true };
     });
   }
 

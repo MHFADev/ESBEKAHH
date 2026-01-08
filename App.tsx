@@ -17,28 +17,30 @@ export default function App() {
 
   const loadImages = async () => {
     try {
-      // 1. Force fetch from API to get the most accurate state
+      // 1. Init API
       await apiService.initDatabase();
       const fetchedImages = await apiService.getImages();
+      
+      // 2. Get Local Data
+      const localData = await dbService.getAllArchives();
       
       if (fetchedImages && fetchedImages.length >= 0) {
         setImages(fetchedImages);
         
-        // 2. Sync Local DB with API data (Cleanup deleted ones locally)
-        const localData = await dbService.getAllArchives();
+        // 3. CRITICAL: Cleanup Local DB if item is not on server anymore
+        // This prevents "zombie" images from reappearing
+        const serverIds = new Set(fetchedImages.map(fi => fi.id.toString()));
         for (const localImg of localData) {
-          if (!fetchedImages.find(fi => fi.id === localImg.id)) {
+          if (!serverIds.has(localImg.id.toString())) {
+            console.log("Cleaning up zombie local image:", localImg.id);
             await dbService.deleteArchive(localImg.id);
           }
         }
       } else {
-        // Fallback to local if API is down
-        const localData = await dbService.getAllArchives();
         setImages(localData);
       }
     } catch (e) {
       console.error("Failed to load images:", e);
-      // Fallback
       const localData = await dbService.getAllArchives();
       setImages(localData);
     }

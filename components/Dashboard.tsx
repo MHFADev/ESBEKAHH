@@ -72,14 +72,17 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
         setAlertConfig(prev => ({ ...prev, isOpen: false }));
         setIsDeleting(true);
         try {
-          // Sync with server if it exists
-          try {
-            await apiService.deleteImage(imgId);
-          } catch (e) {
-            console.warn("Server deletion failed, continuing with local:", e);
+          // 1. Local UI update first for immediate response
+          if (onDeleteImage) {
+             onDeleteImage(imgId);
           }
+          
+          // 2. Sync with local DB
           await dbService.deleteArchive(imgId);
-          if (onDeleteImage) { onDeleteImage(imgId); } else { window.location.reload(); }
+          
+          // 3. Sync with server (background)
+          apiService.deleteImage(imgId).catch(e => console.error("Server sync delete failed:", e));
+          
           setSelectedImage(null);
         } catch (error) {
           console.error("Deletion failed:", error);
