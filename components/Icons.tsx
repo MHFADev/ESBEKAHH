@@ -20,3 +20,4 @@ export * from './icons/ButterflyIcon';
 export * from './icons/RoseIcon';
 export * from './icons/TulipIcon';
 export * from './icons/BlueElement';
+export * from './icons/WakuWakuIcon';

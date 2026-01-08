@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { ArchiveImage } from '../types';
-import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon, Crosshair, HehFace } from './Icons';
+import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon, Crosshair, HehFace, WakuWakuIcon } from './Icons';
 import { CHARACTERS } from '../constants';
 import VisionGallery from './VisionGallery';
 
@@ -109,7 +109,7 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
             >
               <div className="absolute -inset-4 bg-garden-pink blur-3xl opacity-20 animate-pulse" />
               <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[2rem] bg-spy-dark/80 border-2 border-garden-pink/40 flex items-center justify-center overflow-hidden shadow-2xl relative z-10 backdrop-blur-md">
-                <PeanutIcon className="w-14 h-14 sm:w-16 sm:h-16 text-garden-pink" />
+                <WakuWakuIcon className="w-14 h-14 sm:w-16 sm:h-16 text-garden-pink animate-pulse" />
               </div>
             </motion.div>
             
