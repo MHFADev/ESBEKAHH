@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import Background from './components/Background';
+import ThreeBackground from './components/ThreeBackground';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Landing from './components/Landing';
@@ -82,8 +82,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-spy-dark text-garden-pink font-sans selection:bg-garden-rose selection:text-white relative">
-      <Background />
+    <div className="min-h-screen bg-slate-950 text-garden-pink font-sans selection:bg-garden-rose selection:text-white relative">
+      <ThreeBackground />
       <InteractiveDecoration />
       <AnimatePresence mode="wait">
         {view === 'LANDING' && (
