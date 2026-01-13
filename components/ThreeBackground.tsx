@@ -1,176 +1,125 @@
-import React, { useRef, useEffect, useMemo, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { PerspectiveCamera, Float, Stars, Sparkles } from '@react-three/drei';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Points, PointMaterial, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
 // ====================================
-// STYLIZED FLOWERS
+// TECH WAVE PARTICLES
 // ====================================
 
-interface ShapeProps {
-  position: [number, number, number];
-  scale: number;
-  rotation?: [number, number, number];
-  color?: string;
-}
-
-// Stylized Red Rose (Procedural)
-const RedRose = ({ position, scale, rotation = [0, 0, 0] }: ShapeProps) => {
-  const meshRef = useRef<THREE.Group>(null);
-  const [hovered, setHover] = useState(false);
+const WaveParticles = ({ count = 3000, color = '#a855f7' }) => {
+  const points = useRef<THREE.Points>(null);
+  
+  // Generate initial positions
+  const particlesPosition = useMemo(() => {
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const x = (Math.random() - 0.5) * 25;
+      const z = (Math.random() - 0.5) * 25;
+      const y = (Math.random() - 0.5) * 2; // Flat layer
+      
+      positions[i * 3] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
+    }
+    return positions;
+  }, [count]);
 
   useFrame((state) => {
-    if (meshRef.current) {
-      // Gentle floating rotation
-      meshRef.current.rotation.y += 0.005;
-      meshRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
+    if (points.current) {
+      const time = state.clock.getElapsedTime();
       
-      // Hover scale effect
-      const targetScale = hovered ? scale * 1.2 : scale;
-      meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+      // Rotate the entire system slowly
+      points.current.rotation.y = time * 0.05;
+      
+      // Wavy motion for particles
+      const positions = points.current.geometry.attributes.position.array as Float32Array;
+      for (let i = 0; i < count; i++) {
+        const x = positions[i * 3];
+        const z = positions[i * 3 + 2];
+        
+        // Sine wave movement based on position and time
+        positions[i * 3 + 1] = Math.sin(x * 0.5 + time) * 0.5 + Math.sin(z * 0.3 + time * 0.5) * 0.5;
+      }
+      points.current.geometry.attributes.position.needsUpdate = true;
     }
   });
 
   return (
-    <group 
-      ref={meshRef} 
-      position={position} 
-      rotation={new THREE.Euler(...rotation)}
-      onPointerOver={() => setHover(true)}
-      onPointerOut={() => setHover(false)}
-    >
-      <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-        {/* Rose Head - Complex Torus Knot resembles petals */}
-        <mesh castShadow receiveShadow position={[0, 0.5, 0]}>
-          <torusKnotGeometry args={[0.6, 0.25, 128, 32, 3, 7]} />
-          <meshStandardMaterial 
-            color="#991111" 
-            roughness={0.3}
-            metalness={0.1}
-            emissive="#550000"
-            emissiveIntensity={0.2}
-          />
-        </mesh>
-        
-        {/* Inner detail */}
-        <mesh position={[0, 0.5, 0]} scale={0.5}>
-          <torusKnotGeometry args={[0.5, 0.2, 64, 16, 2, 3]} />
-          <meshStandardMaterial color="#bb0000" roughness={0.2} />
-        </mesh>
-
-        {/* Stem */}
-        <mesh position={[0, -1, 0]}>
-          <cylinderGeometry args={[0.08, 0.05, 3, 8]} />
-          <meshStandardMaterial color="#1a472a" roughness={0.8} />
-        </mesh>
-
-        {/* Leaves */}
-        <group position={[0, -0.5, 0]}>
-          <mesh rotation={[0.5, 0, 0.5]} position={[0.4, 0, 0]}>
-            <sphereGeometry args={[0.4, 32, 16]} />
-            <meshStandardMaterial color="#2d5a3f" roughness={0.7} />
-          </mesh>
-          <mesh rotation={[0.5, 0, -0.5]} position={[-0.4, -0.2, 0]}>
-            <sphereGeometry args={[0.4, 32, 16]} />
-            <meshStandardMaterial color="#2d5a3f" roughness={0.7} />
-          </mesh>
-        </group>
-      </Float>
-    </group>
+    <Points ref={points} positions={particlesPosition} stride={3} frustumCulled={false}>
+      <PointMaterial
+        transparent
+        color={color}
+        size={0.05}
+        sizeAttenuation={true}
+        depthWrite={false}
+        opacity={0.6}
+      />
+    </Points>
   );
 };
 
-// Stylized White Tulip (Procedural)
-const WhiteTulip = ({ position, scale, rotation = [0, 0, 0] }: ShapeProps) => {
+// ====================================
+// DIGITAL GRID LINES
+// ====================================
+
+const DigitalGrid = () => {
   const groupRef = useRef<THREE.Group>(null);
-  const [hovered, setHover] = useState(false);
 
   useFrame((state) => {
     if (groupRef.current) {
-      // Gentle sway
-      groupRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 1 + position[0]) * 0.05 + rotation[2];
-      
-      const targetScale = hovered ? scale * 1.15 : scale;
-      groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+      // Gentle floating/breathing effect
+      groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.2) * 0.2 - 2;
+      groupRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.1) * 0.05;
     }
   });
 
   return (
-    <group 
-      ref={groupRef} 
-      position={position} 
-      rotation={new THREE.Euler(...rotation)}
-      onPointerOver={() => setHover(true)}
-      onPointerOut={() => setHover(false)}
-    >
-      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.3}>
-        {/* Tulip Head */}
-        <mesh position={[0, 0.8, 0]} castShadow>
-          {/* Deformed sphere/cone hybrid for tulip shape */}
-          <sphereGeometry args={[0.5, 32, 32, 0, Math.PI * 2, 0, 2.0]} />
-          <meshStandardMaterial 
-            color="#ffffff" 
-            roughness={0.2} 
-            metalness={0.1}
-            emissive="#ffffff"
-            emissiveIntensity={0.1}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-
-        {/* Petal details */}
-        <mesh position={[0, 0.8, 0]} rotation={[0, 1, 0]} scale={[0.9, 0.9, 0.9]}>
-           <sphereGeometry args={[0.5, 32, 32, 0, Math.PI * 2, 0, 1.8]} />
-           <meshStandardMaterial color="#f0f0f0" roughness={0.3} side={THREE.DoubleSide}/>
-        </mesh>
-
-        {/* Stem */}
-        <mesh position={[0, -0.5, 0]}>
-          <cylinderGeometry args={[0.06, 0.04, 2.5, 8]} />
-          <meshStandardMaterial color="#4a7c59" roughness={0.8} />
-        </mesh>
-
-        {/* Long Leaf */}
-        <mesh position={[0.2, -0.8, 0]} rotation={[0, 0, -0.2]} scale={[0.2, 1.2, 0.05]}>
-          <sphereGeometry args={[1, 16, 16]} />
-          <meshStandardMaterial color="#3a6b4a" roughness={0.6} />
-        </mesh>
-      </Float>
+    <group ref={groupRef} rotation={[Math.PI / 2.5, 0, 0]} position={[0, -2, -5]}>
+      <gridHelper args={[40, 40, 0x444444, 0x222222]} />
+      {/* Second grid layer for depth */}
+      <group position={[0, 0.5, 0]}>
+        <gridHelper args={[40, 10, 0x3b82f6, 0x000000]} />
+      </group>
     </group>
   );
 };
 
 // ====================================
-// INTERACTIVE CAMERA
+// CONNECTING NODES (Floating Elements)
 // ====================================
 
-const InteractiveCamera = () => {
-  const { camera, mouse } = useThree();
-  const initialPos = useRef(new THREE.Vector3(0, 0, 12));
-
-  useFrame(() => {
-    // Parallax effect based on mouse position
-    camera.position.x += (mouse.x * 2 - camera.position.x) * 0.05;
-    camera.position.y += (mouse.y * 2 - camera.position.y) * 0.05;
-    camera.lookAt(0, 0, 0);
-  });
+const FloatingNodes = () => {
+  const count = 15;
   
-  return null;
-};
-
-// ====================================
-// LIGHTING SYSTEM
-// ====================================
-
-const GardenLighting = () => {
   return (
-    <>
-      <ambientLight intensity={0.4} color="#e0f2fe" />
-      <pointLight position={[10, 10, 10]} intensity={1.0} color="#fff1f2" castShadow />
-      <pointLight position={[-10, -5, 5]} intensity={0.5} color="#bbf7d0" />
-      <spotLight position={[0, 10, 0]} angle={0.5} penumbra={1} intensity={0.8} color="#ffffff" />
-      <Sparkles count={50} scale={12} size={4} speed={0.4} opacity={0.5} color="#fff" />
-    </>
+    <group>
+      {Array.from({ length: count }).map((_, i) => (
+        <Float 
+          key={i} 
+          speed={1.5} 
+          rotationIntensity={1} 
+          floatIntensity={2} 
+          position={[
+            (Math.random() - 0.5) * 15, 
+            (Math.random() - 0.5) * 10, 
+            (Math.random() - 0.5) * 10
+          ]}
+        >
+          <mesh>
+            <octahedronGeometry args={[0.2, 0]} />
+            <meshStandardMaterial 
+              color="#3b82f6" 
+              emissive="#3b82f6"
+              emissiveIntensity={2}
+              wireframe
+              transparent
+              opacity={0.6}
+            />
+          </mesh>
+        </Float>
+      ))}
+    </group>
   );
 };
 
@@ -178,69 +127,22 @@ const GardenLighting = () => {
 // SCENE COMPOSITION
 // ====================================
 
-const Scene = ({ isMobile }: { isMobile: boolean }) => {
-  // Create a composed garden scene
-  const flowers = useMemo(() => {
-    const items = [];
-    
-    // Central Rose (Hero)
-    items.push(
-      <RedRose 
-        key="hero-rose" 
-        position={[0, 0, 1]} 
-        scale={isMobile ? 1.5 : 2} 
-        rotation={[0.2, 0, 0]}
-      />
-    );
-
-    // Surrounding White Tulips
-    const tulipCount = isMobile ? 4 : 8;
-    for (let i = 0; i < tulipCount; i++) {
-      const angle = (i / tulipCount) * Math.PI * 2;
-      const radius = isMobile ? 2.5 : 4.5;
-      const x = Math.cos(angle) * radius;
-      const y = Math.sin(angle) * radius * 0.5 - 1; // Oval distribution
-      const z = -2 - Math.random() * 3;
-      
-      items.push(
-        <WhiteTulip 
-          key={`tulip-${i}`}
-          position={[x, y, z]} 
-          scale={0.8 + Math.random() * 0.4}
-          rotation={[Math.random() * 0.2, Math.random() * Math.PI, Math.random() * 0.2]} 
-        />
-      );
-    }
-
-    // Background Floating Roses (Small)
-    const bgRoseCount = isMobile ? 3 : 6;
-    for (let i = 0; i < bgRoseCount; i++) {
-      const x = (Math.random() - 0.5) * 15;
-      const y = (Math.random() - 0.5) * 10;
-      const z = -5 - Math.random() * 5;
-      
-      items.push(
-        <RedRose 
-          key={`bg-rose-${i}`}
-          position={[x, y, z]} 
-          scale={0.4 + Math.random() * 0.3}
-          rotation={[Math.random() * Math.PI, Math.random() * Math.PI, 0]} 
-        />
-      );
-    }
-
-    return items;
-  }, [isMobile]);
-
+const Scene = () => {
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
-      <InteractiveCamera />
-      <GardenLighting />
+      <fog attach="fog" args={['#020617', 5, 20]} />
+      <ambientLight intensity={0.5} />
       
-      {flowers}
+      {/* Primary Particle Wave (Purple/Primary) */}
+      <WaveParticles count={2000} color="#a855f7" />
+      
+      {/* Secondary Particle Wave (Blue/Cyan/Accent) */}
+      <group position={[0, -1, 0]} rotation={[0, Math.PI / 4, 0]}>
+         <WaveParticles count={1500} color="#3b82f6" />
+      </group>
 
-      <fog attach="fog" args={['#020617', 5, 25]} />
+      <DigitalGrid />
+      <FloatingNodes />
     </>
   );
 };
@@ -250,19 +152,10 @@ const Scene = ({ isMobile }: { isMobile: boolean }) => {
 // ====================================
 
 const ThreeBackground: React.FC = () => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
       <Canvas
-        shadows
+        camera={{ position: [0, 2, 8], fov: 60 }}
         dpr={[1, 2]}
         gl={{ 
           antialias: true, 
@@ -271,9 +164,11 @@ const ThreeBackground: React.FC = () => {
         }}
         style={{ background: 'transparent' }}
       >
-        <Scene isMobile={isMobile} />
+        <Scene />
       </Canvas>
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-transparent to-slate-950/80 pointer-events-none" />
+      {/* Vignette & Gradient Overlay for readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50 opacity-90" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
     </div>
   );
 };
