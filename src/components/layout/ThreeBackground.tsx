@@ -1,26 +1,21 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Points, PointMaterial, Float } from '@react-three/drei';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Points, PointMaterial, Float, Stars, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
 // ====================================
-// TECH WAVE PARTICLES
+// THEMATIC PARTICLES (Garden Petals & Tech Dust)
 // ====================================
 
-const WaveParticles = ({ count = 3000, color = '#a855f7' }) => {
+const ThematicParticles = ({ count = 2000, color = '#FFB7C5', size = 0.05 }) => {
   const points = useRef<THREE.Points>(null);
   
-  // Generate initial positions
   const particlesPosition = useMemo(() => {
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      const x = (Math.random() - 0.5) * 25;
-      const z = (Math.random() - 0.5) * 25;
-      const y = (Math.random() - 0.5) * 2; // Flat layer
-      
-      positions[i * 3] = x;
-      positions[i * 3 + 1] = y;
-      positions[i * 3 + 2] = z;
+      positions[i * 3] = (Math.random() - 0.5) * 30;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 30;
     }
     return positions;
   }, [count]);
@@ -28,18 +23,14 @@ const WaveParticles = ({ count = 3000, color = '#a855f7' }) => {
   useFrame((state) => {
     if (points.current) {
       const time = state.clock.getElapsedTime();
+      points.current.rotation.y = time * 0.02;
+      points.current.rotation.x = Math.sin(time * 0.1) * 0.1;
       
-      // Rotate the entire system slowly
-      points.current.rotation.y = time * 0.05;
-      
-      // Wavy motion for particles
       const positions = points.current.geometry.attributes.position.array as Float32Array;
       for (let i = 0; i < count; i++) {
         const x = positions[i * 3];
         const z = positions[i * 3 + 2];
-        
-        // Sine wave movement based on position and time
-        positions[i * 3 + 1] = Math.sin(x * 0.5 + time) * 0.5 + Math.sin(z * 0.3 + time * 0.5) * 0.5;
+        positions[i * 3 + 1] += Math.sin(time + x) * 0.002; // Gentle floating
       }
       points.current.geometry.attributes.position.needsUpdate = true;
     }
@@ -50,71 +41,52 @@ const WaveParticles = ({ count = 3000, color = '#a855f7' }) => {
       <PointMaterial
         transparent
         color={color}
-        size={0.05}
+        size={size}
         sizeAttenuation={true}
         depthWrite={false}
-        opacity={0.6}
+        opacity={0.4}
+        blending={THREE.AdditiveBlending}
       />
     </Points>
   );
 };
 
 // ====================================
-// DIGITAL GRID LINES
+// STELLA STARS (Floating Achievements)
 // ====================================
 
-const DigitalGrid = () => {
+const StellaStars = () => {
   const groupRef = useRef<THREE.Group>(null);
+  const count = 8;
 
   useFrame((state) => {
     if (groupRef.current) {
-      // Gentle floating/breathing effect
-      groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.2) * 0.2 - 2;
-      groupRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.1) * 0.05;
+      groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.1;
     }
   });
 
   return (
-    <group ref={groupRef} rotation={[Math.PI / 2.5, 0, 0]} position={[0, -2, -5]}>
-      <gridHelper args={[40, 40, 0x444444, 0x222222]} />
-      {/* Second grid layer for depth */}
-      <group position={[0, 0.5, 0]}>
-        <gridHelper args={[40, 10, 0x3b82f6, 0x000000]} />
-      </group>
-    </group>
-  );
-};
-
-// ====================================
-// CONNECTING NODES (Floating Elements)
-// ====================================
-
-const FloatingNodes = () => {
-  const count = 15;
-  
-  return (
-    <group>
+    <group ref={groupRef}>
       {Array.from({ length: count }).map((_, i) => (
         <Float 
           key={i} 
-          speed={1.5} 
-          rotationIntensity={1} 
-          floatIntensity={2} 
+          speed={2} 
+          rotationIntensity={2} 
+          floatIntensity={1.5}
           position={[
-            (Math.random() - 0.5) * 15, 
-            (Math.random() - 0.5) * 10, 
+            (Math.random() - 0.5) * 20,
+            (Math.random() - 0.5) * 15,
             (Math.random() - 0.5) * 10
           ]}
         >
-          <mesh>
-            <octahedronGeometry args={[0.2, 0]} />
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <torusKnotGeometry args={[0.15, 0.05, 64, 8, 2, 3]} />
             <meshStandardMaterial 
-              color="#3b82f6" 
-              emissive="#3b82f6"
-              emissiveIntensity={2}
-              wireframe
-              transparent
-              opacity={0.6}
+              color="#C5A059" 
+              emissive="#C5A059" 
+              emissiveIntensity={2} 
+              metalness={1} 
+              roughness={0.2} 
             />
           </mesh>
         </Float>
@@ -124,51 +96,61 @@ const FloatingNodes = () => {
 };
 
 // ====================================
-// SCENE COMPOSITION
+// INTERACTIVE SCENE
 // ====================================
 
 const Scene = () => {
-  return (
-    <>
-      <fog attach="fog" args={['#020617', 5, 20]} />
-      <ambientLight intensity={0.5} />
-      
-      {/* Primary Particle Wave (Purple/Primary) */}
-      <WaveParticles count={2000} color="#a855f7" />
-      
-      {/* Secondary Particle Wave (Blue/Cyan/Accent) */}
-      <group position={[0, -1, 0]} rotation={[0, Math.PI / 4, 0]}>
-         <WaveParticles count={1500} color="#3b82f6" />
-      </group>
+  const { mouse, viewport } = useThree();
+  const groupRef = useRef<THREE.Group>(null);
 
-      <DigitalGrid />
-      <FloatingNodes />
-    </>
+  useFrame(() => {
+    if (groupRef.current) {
+      // Smooth parallax based on mouse
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, mouse.y * 0.1, 0.05);
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, mouse.x * 0.1, 0.05);
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      <fog attach="fog" args={['#050505', 5, 25]} />
+      <ambientLight intensity={0.2} />
+      <pointLight position={[10, 10, 10]} intensity={1} color="#FFB7C5" />
+      <pointLight position={[-10, -10, -10]} intensity={0.5} color="#4A90E2" />
+      
+      {/* Background Stars */}
+      <Stars radius={50} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+      
+      {/* Garden Petals (Pink) */}
+      <ThematicParticles count={1500} color="#FFB7C5" size={0.08} />
+      
+      {/* Tech Dust (Blue) */}
+      <ThematicParticles count={800} color="#4A90E2" size={0.04} />
+      
+      {/* Stella Stars */}
+      <StellaStars />
+
+      {/* Grid Floor */}
+      <group position={[0, -5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <gridHelper args={[50, 50, '#E14D68', '#0B1026']} opacity={0.2} transparent />
+      </group>
+    </group>
   );
 };
 
-// ====================================
-// MAIN COMPONENT
-// ====================================
-
 const ThreeBackground: React.FC = () => {
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none">
+    <div className="fixed inset-0 z-0 pointer-events-none bg-spy-dark">
       <Canvas
-        camera={{ position: [0, 2, 8], fov: 60 }}
         dpr={[1, 2]}
-        gl={{ 
-          antialias: true, 
-          alpha: true,
-          toneMapping: THREE.ACESFilmicToneMapping,
-        }}
-        style={{ background: 'transparent' }}
+        gl={{ antialias: true, alpha: true }}
       >
+        <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
         <Scene />
       </Canvas>
-      {/* Vignette & Gradient Overlay for readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50 opacity-90" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
+      {/* Overlay Gradients */}
+      <div className="absolute inset-0 bg-gradient-to-b from-spy-dark/40 via-transparent to-spy-dark/80" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#050505_100%)] opacity-60" />
     </div>
   );
 };
