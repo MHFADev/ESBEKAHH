@@ -48,6 +48,10 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
 
   return (
     <div className="relative w-full max-w-7xl mx-auto pt-24 pb-12 px-4 sm:px-6">
+      {/* Watermark */}
+      <div className="fixed bottom-4 right-4 z-[9999] opacity-30 font-mono text-[10px] text-spy-gold tracking-[0.2em] pointer-events-none uppercase">
+        Made With MHFADev
+      </div>
       {/* Progress Bar for Scroll */}
       <motion.div 
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-garden-pink via-spy-red to-garden-pink z-[100] origin-left"
@@ -102,42 +106,42 @@ const VisitorVisor: React.FC<VisitorVisorProps> = ({ images, agentId }) => {
 
         {/* Header Area */}
         <div className="p-8 sm:p-12 border-b border-white/5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10 relative z-40 bg-gradient-to-br from-garden-pink/10 via-transparent to-spy-red/5">
-          <div className="flex items-center gap-8 w-full lg:w-auto">
+          <div className="flex items-center gap-4 sm:gap-8 w-full lg:w-auto">
             <motion.div 
               whileHover={{ scale: 1.1, rotate: 10 }}
               className="relative shrink-0"
             >
               <div className="absolute -inset-4 bg-garden-pink blur-3xl opacity-20 animate-pulse" />
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[2rem] bg-spy-dark/80 border-2 border-garden-pink/40 flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(255,183,197,0.3)] relative z-10 backdrop-blur-md">
-                <WakuWakuIcon className="w-14 h-14 sm:w-16 sm:h-16 text-garden-pink animate-pulse drop-shadow-[0_0_8px_rgba(255,183,197,0.8)]" />
+              <div className="w-16 h-16 sm:w-28 sm:h-28 rounded-[1.5rem] sm:rounded-[2rem] bg-spy-dark/80 border-2 border-garden-pink/40 flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(255,183,197,0.3)] relative z-10 backdrop-blur-md">
+                <WakuWakuIcon className="w-10 h-10 sm:w-16 sm:h-16 text-garden-pink animate-pulse drop-shadow-[0_0_8px_rgba(255,183,197,0.8)]" />
               </div>
             </motion.div>
             
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <Star className="w-4 h-4 text-spy-gold fill-spy-gold" />
-                <span className="text-xs font-serif font-bold text-spy-gold tracking-[0.4em] uppercase">
+              <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <Star className="w-3 h-3 sm:w-4 sm:h-4 text-spy-gold fill-spy-gold" />
+                <span className="text-[8px] sm:text-xs font-serif font-bold text-spy-gold tracking-[0.2em] sm:tracking-[0.4em] uppercase">
                   Anak Kesayangan Bu Retno
                 </span>
               </div>
-              <h1 className="text-5xl sm:text-7xl font-display font-black text-white tracking-tighter leading-tight">
+              <h1 className="text-3xl sm:text-7xl font-display font-black text-white tracking-tighter leading-tight">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-garden-pink to-white drop-shadow-2xl">ESBEKAHH</span>
-                <span className="block text-white/30 text-3xl sm:text-4xl tracking-[0.2em] mt-1 font-mono">ARCHIVE_V2</span>
+                <span className="block text-white/30 text-lg sm:text-4xl tracking-[0.1em] sm:tracking-[0.2em] mt-0.5 sm:mt-1 font-mono">ARCHIVE_V2</span>
               </h1>
             </div>
           </div>
 
-          <div className="flex gap-6 w-full lg:w-auto">
-            <div className="flex-1 lg:flex-none bg-white/5 border border-white/10 p-6 rounded-[2rem] backdrop-blur-xl group hover:border-garden-pink/40 transition-colors">
-              <div className="text-[10px] font-mono text-garden-pink/60 mb-2 tracking-[0.3em]">INTEL_COUNT</div>
-              <div className="text-4xl font-display font-bold text-white flex items-baseline gap-2">
+          <div className="flex gap-4 sm:gap-6 w-full lg:w-auto">
+            <div className="flex-1 lg:flex-none bg-white/5 border border-white/10 p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] backdrop-blur-xl group hover:border-garden-pink/40 transition-colors text-center lg:text-left">
+              <div className="text-[8px] sm:text-[10px] font-mono text-garden-pink/60 mb-1 sm:mb-2 tracking-[0.2em] sm:tracking-[0.3em]">INTEL_COUNT</div>
+              <div className="text-2xl sm:text-4xl font-display font-bold text-white flex items-baseline justify-center lg:justify-start gap-1 sm:gap-2">
                 {images.length}
-                <span className="text-xs text-white/30 font-mono">FILES</span>
+                <span className="text-[10px] sm:text-xs text-white/30 font-mono uppercase">FILES</span>
               </div>
             </div>
-            <div className="flex-1 lg:flex-none bg-white/5 border border-white/10 p-6 rounded-[2rem] backdrop-blur-xl group hover:border-spy-red/40 transition-colors text-center">
-              <div className="text-[10px] font-mono text-spy-red/60 mb-2 tracking-[0.3em]">THREAT_LVL</div>
-              <div className="text-4xl font-display font-bold text-spy-red">LOW</div>
+            <div className="flex-1 lg:flex-none bg-white/5 border border-white/10 p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] backdrop-blur-xl group hover:border-spy-red/40 transition-colors text-center">
+              <div className="text-[8px] sm:text-[10px] font-mono text-spy-red/60 mb-1 sm:mb-2 tracking-[0.2em] sm:tracking-[0.3em]">THREAT_LVL</div>
+              <div className="text-2xl sm:text-4xl font-display font-bold text-spy-red uppercase">LOW</div>
             </div>
           </div>
         </div>

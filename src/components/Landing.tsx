@@ -13,6 +13,10 @@ const Landing: React.FC<LandingProps> = ({ onVisitorEntry, onMemberEntry }) => {
 
   return (
     <div className="relative z-10 min-h-screen flex flex-col md:flex-row overflow-hidden">
+      {/* Watermark */}
+      <div className="fixed bottom-4 right-4 z-[9999] opacity-30 font-mono text-[10px] text-spy-gold tracking-[0.2em] pointer-events-none uppercase">
+        Made With MHFADev
+      </div>
       
       {/* LEFT SIDE: VISITOR (Garden/Anya Theme - Soft Pink, Tulips, Butterflies) */}
       <motion.div 

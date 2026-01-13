@@ -165,7 +165,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
   const ImageGrid = useMemo(() => {
     if (images.length === 0) return null;
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-12 w-full max-w-7xl">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 mt-8 md:mt-12 w-full max-w-7xl">
         {images.map((img) => (
           <motion.div
             key={img.id}
@@ -174,9 +174,9 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
             className="aspect-square relative group cursor-pointer overflow-hidden rounded-lg border border-spy-red/20 bg-spy-dark"
           >
             <img src={img.thumbnailUrl || img.url} alt={img.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all loading-lazy" />
-            <div className="absolute inset-0 bg-gradient-to-t from-spy-dark to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
-              <p className="text-[10px] font-mono text-spy-red tracking-widest truncate">{img.name}</p>
-              <p className="text-[8px] font-mono text-white/40">{new Date(img.timestamp).toLocaleDateString()}</p>
+            <div className="absolute inset-0 bg-gradient-to-t from-spy-dark to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-2 md:p-3 flex flex-col justify-end">
+              <p className="text-[8px] md:text-[10px] font-mono text-spy-red tracking-widest truncate">{img.name}</p>
+              <p className="text-[6px] md:text-[8px] font-mono text-white/40">{new Date(img.timestamp).toLocaleDateString()}</p>
             </div>
           </motion.div>
         ))}
@@ -186,6 +186,10 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
 
   return (
     <div className="relative z-10 min-h-screen pb-20 overflow-x-hidden">
+      {/* Watermark */}
+      <div className="fixed bottom-4 right-4 z-[9999] opacity-30 font-mono text-[10px] text-spy-gold tracking-[0.2em] pointer-events-none uppercase">
+        Made With MHFADev
+      </div>
       <CustomAlert 
         isOpen={alertConfig.isOpen}
         title={alertConfig.title}
@@ -197,19 +201,19 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
       {/* Header Bar */}
       <motion.header 
         initial={{ y: -50 }} animate={{ y: 0 }}
-        className={`sticky top-0 z-50 backdrop-blur-xl border-b px-6 py-4 flex items-center justify-between transition-colors duration-500 ${
+        className={`sticky top-0 z-50 backdrop-blur-xl border-b px-4 md:px-6 py-3 md:py-4 flex items-center justify-between transition-colors duration-500 ${
             isReadOnly ? 'bg-garden-pink/10 border-garden-pink/30' : 'bg-spy-navy/90 border-spy-red/30'
         }`}
       >
-        <div className="flex items-center gap-4">
-          <div className={`w-12 h-12 rounded-full border flex items-center justify-center overflow-hidden ${isReadOnly ? 'bg-spy-dark border-garden-pink/40' : 'bg-spy-dark border-spy-red'}`}>
-             {isReadOnly ? <WakuWakuIcon className="w-8 h-8 text-garden-pink animate-pulse" /> : <span className="font-display font-bold text-xl">{agentId}</span>}
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full border flex items-center justify-center overflow-hidden ${isReadOnly ? 'bg-spy-dark border-garden-pink/40' : 'bg-spy-dark border-spy-red'}`}>
+             {isReadOnly ? <WakuWakuIcon className="w-6 h-6 md:w-8 md:h-8 text-garden-pink animate-pulse" /> : <span className="font-display font-bold text-lg md:text-xl">{agentId}</span>}
           </div>
           <div>
-            <h2 className={`font-display text-lg leading-none ${isReadOnly ? 'text-garden-pink' : 'text-spy-cream'}`}>{isReadOnly ? "ANYA'S ALBUM" : 'WISE ARCHIVES'}</h2>
+            <h2 className={`font-display text-sm md:text-lg leading-none ${isReadOnly ? 'text-garden-pink' : 'text-spy-cream'}`}>{isReadOnly ? "ANYA'S ALBUM" : 'WISE ARCHIVES'}</h2>
           </div>
         </div>
-        <button onClick={onLogout} className={`p-2 font-bold ${isReadOnly ? 'text-garden-pink' : 'text-spy-cream'}`}><LogOut size={20} /></button>
+        <button onClick={onLogout} className={`p-2 font-bold ${isReadOnly ? 'text-garden-pink' : 'text-spy-cream'}`}><LogOut size={18} className="md:w-5 md:h-5" /></button>
       </motion.header>
 
       <main className="container mx-auto px-4 mt-12 relative">

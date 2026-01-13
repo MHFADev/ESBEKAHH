@@ -36,6 +36,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onBack }) => {
 
   return (
     <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
+      {/* Watermark */}
+      <div className="fixed bottom-4 right-4 z-[9999] opacity-30 font-mono text-[10px] text-spy-gold tracking-[0.2em] pointer-events-none uppercase">
+        Made With MHFADev
+      </div>
       <motion.div
         initial={{ opacity: 0, scale: 0.9, rotateX: 20 }}
         animate={{ opacity: 1, scale: 1, rotateX: 0 }}
