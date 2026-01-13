@@ -1,252 +1,157 @@
 import React, { useRef, useEffect, useMemo, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { PerspectiveCamera } from '@react-three/drei';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { PerspectiveCamera, Float, Stars, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 
 // ====================================
-// CUTE 3D SHAPES - No Float Component
+// STYLIZED FLOWERS
 // ====================================
 
-// Rounded Cube (Cute mascot-style shape)
 interface ShapeProps {
   position: [number, number, number];
   scale: number;
-  color: string;
-  layer: 'foreground' | 'midground' | 'background';
+  rotation?: [number, number, number];
+  color?: string;
 }
 
-const RoundedCube = ({ position, scale, color, layer }: ShapeProps) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const initialRotation = useMemo(() => [
-    Math.random() * Math.PI,
-    Math.random() * Math.PI,
-    Math.random() * Math.PI
-  ], []);
-
-  useFrame(({ clock }) => {
-    if (meshRef.current) {
-      // Gentle breathing scale animation
-      const breathe = Math.sin(clock.getElapsedTime() * 0.8 + position[0]) * 0.05 + 1;
-      meshRef.current.scale.setScalar(scale * breathe);
-      
-      // Slow rotation grounded in space
-      meshRef.current.rotation.x = initialRotation[0] + clock.getElapsedTime() * 0.1;
-      meshRef.current.rotation.y = initialRotation[1] + clock.getElapsedTime() * 0.15;
-    }
-  });
-
-  return (
-    <mesh ref={meshRef} position={position} castShadow receiveShadow>
-      <boxGeometry args={[1, 1, 1, 4, 4, 4]} />
-      <meshStandardMaterial 
-        color={color}
-        roughness={0.6}
-        metalness={0.2}
-        emissive={color}
-        emissiveIntensity={0.1}
-      />
-    </mesh>
-  );
-};
-
-// Soft Sphere (Organic shape)
-const SoftSphere = ({ position, scale, color, layer }: ShapeProps) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const orbitSpeed = useMemo(() => 0.05 + Math.random() * 0.1, []);
-  const orbitRadius = useMemo(() => 0.2 + Math.random() * 0.3, []);
-
-  useFrame(({ clock }) => {
-    if (meshRef.current) {
-      const time = clock.getElapsedTime() * orbitSpeed;
-      
-      // Circular orbit motion
-      meshRef.current.position.x = position[0] + Math.cos(time) * orbitRadius;
-      meshRef.current.position.y = position[1] + Math.sin(time * 1.3) * orbitRadius * 0.5;
-      
-      // Pulsing scale
-      const pulse = Math.sin(clock.getElapsedTime() * 1.5 + position[1]) * 0.1 + 1;
-      meshRef.current.scale.setScalar(scale * pulse);
-    }
-  });
-
-  return (
-    <mesh ref={meshRef} position={position} castShadow receiveShadow>
-      <sphereGeometry args={[0.8, 32, 32]} />
-      <meshStandardMaterial 
-        color={color}
-        roughness={0.4}
-        metalness={0.3}
-        emissive={color}
-        emissiveIntensity={0.15}
-      />
-    </mesh>
-  );
-};
-
-// Torus (Playful donut shape)
-const PlayfulTorus = ({ position, scale, color, layer }: ShapeProps) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const wobbleSpeed = useMemo(() => 0.6 + Math.random() * 0.4, []);
-
-  useFrame(({ clock }) => {
-    if (meshRef.current) {
-      // Wobble rotation
-      meshRef.current.rotation.x = Math.sin(clock.getElapsedTime() * wobbleSpeed) * 0.3;
-      meshRef.current.rotation.y = clock.getElapsedTime() * 0.2;
-      meshRef.current.rotation.z = Math.cos(clock.getElapsedTime() * wobbleSpeed * 0.7) * 0.2;
-      
-      // Gentle scale breathing
-      const breathe = Math.sin(clock.getElapsedTime() * 1.2 + position[2]) * 0.08 + 1;
-      meshRef.current.scale.setScalar(scale * breathe);
-    }
-  });
-
-  return (
-    <mesh ref={meshRef} position={position} castShadow receiveShadow>
-      <torusGeometry args={[0.6, 0.25, 24, 48]} />
-      <meshStandardMaterial 
-        color={color}
-        roughness={0.5}
-        metalness={0.25}
-      />
-    </mesh>
-  );
-};
-
-// Star Shape (Decorative icon)
-const StarShape = ({ position, scale, color, layer }: ShapeProps) => {
+// Stylized Red Rose (Procedural)
+const RedRose = ({ position, scale, rotation = [0, 0, 0] }: ShapeProps) => {
   const meshRef = useRef<THREE.Group>(null);
-  const spinSpeed = useMemo(() => 0.3 + Math.random() * 0.3, []);
+  const [hovered, setHover] = useState(false);
 
-  useFrame(({ clock }) => {
+  useFrame((state) => {
     if (meshRef.current) {
-      meshRef.current.rotation.z = clock.getElapsedTime() * spinSpeed;
+      // Gentle floating rotation
+      meshRef.current.rotation.y += 0.005;
+      meshRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
       
-      // Twinkle effect
-      const twinkle = Math.sin(clock.getElapsedTime() * 2 + position[0] * 2) * 0.15 + 1;
-      meshRef.current.scale.setScalar(scale * twinkle);
+      // Hover scale effect
+      const targetScale = hovered ? scale * 1.2 : scale;
+      meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
     }
   });
 
-  // Create star shape using extruded geometry
-  const starShape = useMemo(() => {
-    const shape = new THREE.Shape();
-    const outerRadius = 0.5;
-    const innerRadius = 0.2;
-    const points = 5;
-    
-    for (let i = 0; i < points * 2; i++) {
-      const radius = i % 2 === 0 ? outerRadius : innerRadius;
-      const angle = (i / (points * 2)) * Math.PI * 2;
-      const x = Math.cos(angle) * radius;
-      const y = Math.sin(angle) * radius;
-      if (i === 0) shape.moveTo(x, y);
-      else shape.lineTo(x, y);
-    }
-    shape.closePath();
-    return shape;
-  }, []);
-
   return (
-    <group ref={meshRef} position={position}>
-      <mesh castShadow receiveShadow>
-        <extrudeGeometry args={[starShape, { depth: 0.15, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05 }]} />
-        <meshStandardMaterial 
-          color={color}
-          roughness={0.3}
-          metalness={0.4}
-          emissive={color}
-          emissiveIntensity={0.2}
-        />
-      </mesh>
+    <group 
+      ref={meshRef} 
+      position={position} 
+      rotation={new THREE.Euler(...rotation)}
+      onPointerOver={() => setHover(true)}
+      onPointerOut={() => setHover(false)}
+    >
+      <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+        {/* Rose Head - Complex Torus Knot resembles petals */}
+        <mesh castShadow receiveShadow position={[0, 0.5, 0]}>
+          <torusKnotGeometry args={[0.6, 0.25, 128, 32, 3, 7]} />
+          <meshStandardMaterial 
+            color="#991111" 
+            roughness={0.3}
+            metalness={0.1}
+            emissive="#550000"
+            emissiveIntensity={0.2}
+          />
+        </mesh>
+        
+        {/* Inner detail */}
+        <mesh position={[0, 0.5, 0]} scale={0.5}>
+          <torusKnotGeometry args={[0.5, 0.2, 64, 16, 2, 3]} />
+          <meshStandardMaterial color="#bb0000" roughness={0.2} />
+        </mesh>
+
+        {/* Stem */}
+        <mesh position={[0, -1, 0]}>
+          <cylinderGeometry args={[0.08, 0.05, 3, 8]} />
+          <meshStandardMaterial color="#1a472a" roughness={0.8} />
+        </mesh>
+
+        {/* Leaves */}
+        <group position={[0, -0.5, 0]}>
+          <mesh rotation={[0.5, 0, 0.5]} position={[0.4, 0, 0]}>
+            <sphereGeometry args={[0.4, 32, 16]} />
+            <meshStandardMaterial color="#2d5a3f" roughness={0.7} />
+          </mesh>
+          <mesh rotation={[0.5, 0, -0.5]} position={[-0.4, -0.2, 0]}>
+            <sphereGeometry args={[0.4, 32, 16]} />
+            <meshStandardMaterial color="#2d5a3f" roughness={0.7} />
+          </mesh>
+        </group>
+      </Float>
     </group>
   );
 };
 
-// Heart Shape (Cute mascot element)
-const HeartShape = ({ position, scale, color, layer }: ShapeProps) => {
-  const meshRef = useRef<THREE.Mesh>(null);
+// Stylized White Tulip (Procedural)
+const WhiteTulip = ({ position, scale, rotation = [0, 0, 0] }: ShapeProps) => {
+  const groupRef = useRef<THREE.Group>(null);
+  const [hovered, setHover] = useState(false);
 
-  useFrame(({ clock }) => {
-    if (meshRef.current) {
-      // Heartbeat animation
-      const beat = Math.sin(clock.getElapsedTime() * 2.5 + position[0]) * 0.12 + 1;
-      meshRef.current.scale.setScalar(scale * beat);
+  useFrame((state) => {
+    if (groupRef.current) {
+      // Gentle sway
+      groupRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 1 + position[0]) * 0.05 + rotation[2];
       
-      // Gentle rotation
-      meshRef.current.rotation.y = Math.sin(clock.getElapsedTime() * 0.5) * 0.3;
-    }
-  });
-
-  // Create heart shape
-  const heartShape = useMemo(() => {
-    const shape = new THREE.Shape();
-    shape.moveTo(0, 0.25);
-    shape.bezierCurveTo(0, 0.25, -0.25, 0.6, -0.5, 0.35);
-    shape.bezierCurveTo(-0.75, 0.1, -0.75, -0.2, -0.5, -0.4);
-    shape.bezierCurveTo(-0.25, -0.6, 0, -0.8, 0, -1);
-    shape.bezierCurveTo(0, -0.8, 0.25, -0.6, 0.5, -0.4);
-    shape.bezierCurveTo(0.75, -0.2, 0.75, 0.1, 0.5, 0.35);
-    shape.bezierCurveTo(0.25, 0.6, 0, 0.25, 0, 0.25);
-    return shape;
-  }, []);
-
-  return (
-    <mesh ref={meshRef} position={position} castShadow receiveShadow>
-      <extrudeGeometry args={[heartShape, { depth: 0.2, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.08 }]} />
-      <meshStandardMaterial 
-        color={color}
-        roughness={0.4}
-        metalness={0.2}
-      />
-    </mesh>
-  );
-};
-
-// Pill Shape (Modern capsule)
-const PillShape = ({ position, scale, color, layer }: ShapeProps) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const rotationAxis = useMemo(() => Math.random() > 0.5 ? 'x' : 'z', []);
-
-  useFrame(({ clock }) => {
-    if (meshRef.current) {
-      if (rotationAxis === 'x') {
-        meshRef.current.rotation.x = clock.getElapsedTime() * 0.4;
-      } else {
-        meshRef.current.rotation.z = clock.getElapsedTime() * 0.4;
-      }
-      meshRef.current.rotation.y = clock.getElapsedTime() * 0.2;
+      const targetScale = hovered ? scale * 1.15 : scale;
+      groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
     }
   });
 
   return (
-    <mesh ref={meshRef} position={position} castShadow receiveShadow>
-      <capsuleGeometry args={[0.3, 0.8, 16, 32]} />
-      <meshStandardMaterial 
-        color={color}
-        roughness={0.3}
-        metalness={0.4}
-        emissive={color}
-        emissiveIntensity={0.1}
-      />
-    </mesh>
+    <group 
+      ref={groupRef} 
+      position={position} 
+      rotation={new THREE.Euler(...rotation)}
+      onPointerOver={() => setHover(true)}
+      onPointerOut={() => setHover(false)}
+    >
+      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.3}>
+        {/* Tulip Head */}
+        <mesh position={[0, 0.8, 0]} castShadow>
+          {/* Deformed sphere/cone hybrid for tulip shape */}
+          <sphereGeometry args={[0.5, 32, 32, 0, Math.PI * 2, 0, 2.0]} />
+          <meshStandardMaterial 
+            color="#ffffff" 
+            roughness={0.2} 
+            metalness={0.1}
+            emissive="#ffffff"
+            emissiveIntensity={0.1}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+
+        {/* Petal details */}
+        <mesh position={[0, 0.8, 0]} rotation={[0, 1, 0]} scale={[0.9, 0.9, 0.9]}>
+           <sphereGeometry args={[0.5, 32, 32, 0, Math.PI * 2, 0, 1.8]} />
+           <meshStandardMaterial color="#f0f0f0" roughness={0.3} side={THREE.DoubleSide}/>
+        </mesh>
+
+        {/* Stem */}
+        <mesh position={[0, -0.5, 0]}>
+          <cylinderGeometry args={[0.06, 0.04, 2.5, 8]} />
+          <meshStandardMaterial color="#4a7c59" roughness={0.8} />
+        </mesh>
+
+        {/* Long Leaf */}
+        <mesh position={[0.2, -0.8, 0]} rotation={[0, 0, -0.2]} scale={[0.2, 1.2, 0.05]}>
+          <sphereGeometry args={[1, 16, 16]} />
+          <meshStandardMaterial color="#3a6b4a" roughness={0.6} />
+        </mesh>
+      </Float>
+    </group>
   );
 };
 
 // ====================================
-// CINEMATIC CAMERA
+// INTERACTIVE CAMERA
 // ====================================
 
-const CinematicCamera = () => {
-  useFrame(({ clock, camera }) => {
-    const time = clock.getElapsedTime() * 0.08;
-    
-    // Slow orbital movement
-    camera.position.x = Math.sin(time) * 1.5;
-    camera.position.y = Math.cos(time * 0.7) * 0.8;
-    camera.position.z = 10 + Math.sin(time * 0.5) * 0.5;
-    
-    // Always look at center
+const InteractiveCamera = () => {
+  const { camera, mouse } = useThree();
+  const initialPos = useRef(new THREE.Vector3(0, 0, 12));
+
+  useFrame(() => {
+    // Parallax effect based on mouse position
+    camera.position.x += (mouse.x * 2 - camera.position.x) * 0.05;
+    camera.position.y += (mouse.y * 2 - camera.position.y) * 0.05;
     camera.lookAt(0, 0, 0);
   });
   
@@ -257,185 +162,85 @@ const CinematicCamera = () => {
 // LIGHTING SYSTEM
 // ====================================
 
-const SoftLighting = () => {
-  const keyLightRef = useRef<THREE.PointLight>(null);
-  const fillLightRef = useRef<THREE.PointLight>(null);
-
-  useFrame(({ clock }) => {
-    if (keyLightRef.current) {
-      // Gentle light movement
-      const time = clock.getElapsedTime() * 0.3;
-      keyLightRef.current.position.x = Math.sin(time) * 5;
-      keyLightRef.current.position.z = Math.cos(time) * 5;
-    }
-  });
-
+const GardenLighting = () => {
   return (
     <>
-      {/* Soft ambient for overall brightness */}
-      <ambientLight intensity={0.4} color="#fef3f9" />
-      
-      {/* Key light - warm pink */}
-      <pointLight 
-        ref={keyLightRef}
-        position={[8, 8, 5]} 
-        intensity={0.8} 
-        color="#fda4af"
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-      />
-      
-      {/* Fill light - cool blue */}
-      <pointLight 
-        ref={fillLightRef}
-        position={[-6, 4, 8]} 
-        intensity={0.5} 
-        color="#bae6fd"
-      />
-      
-      {/* Back light for rim lighting */}
-      <pointLight 
-        position={[0, -5, -8]} 
-        intensity={0.3} 
-        color="#e9d5ff"
-      />
-      
-      {/* Top spotlight for bloom effect */}
-      <spotLight
-        position={[0, 12, 0]}
-        angle={0.8}
-        penumbra={1}
-        intensity={0.4}
-        color="#ffffff"
-        castShadow
-      />
+      <ambientLight intensity={0.4} color="#e0f2fe" />
+      <pointLight position={[10, 10, 10]} intensity={1.0} color="#fff1f2" castShadow />
+      <pointLight position={[-10, -5, 5]} intensity={0.5} color="#bbf7d0" />
+      <spotLight position={[0, 10, 0]} angle={0.5} penumbra={1} intensity={0.8} color="#ffffff" />
+      <Sparkles count={50} scale={12} size={4} speed={0.4} opacity={0.5} color="#fff" />
     </>
   );
 };
 
 // ====================================
-// DEPTH-LAYERED SCENE COMPOSITION
+// SCENE COMPOSITION
 // ====================================
 
-interface SceneObject {
-  component: React.ComponentType<ShapeProps>;
-  position: [number, number, number];
-  scale: number;
-  color: string;
-  layer: 'foreground' | 'midground' | 'background';
-  key: string;
-}
-
 const Scene = ({ isMobile }: { isMobile: boolean }) => {
-  // Soft pastel palette - cute & elegant
-  const colors = {
-    pastelPink: '#fda4af',
-    pastelBlue: '#93c5fd',
-    pastelPurple: '#d8b4fe',
-    pastelYellow: '#fde68a',
-    pastelGreen: '#a7f3d0',
-    pastelPeach: '#fcd34d',
-    softRose: '#fecdd3',
-    softLavender: '#e9d5ff',
-  };
-
-  const colorArray = Object.values(colors);
-
-  // Component types for variety
-  const shapeTypes = [
-    RoundedCube,
-    SoftSphere,
-    PlayfulTorus,
-    StarShape,
-    HeartShape,
-    PillShape,
-  ];
-
-  // Generate layered objects with clear depth separation
-  const sceneObjects = useMemo<SceneObject[]>(() => {
-    const objects: SceneObject[] = [];
-    const count = isMobile ? 30 : 60; // Many objects for visual richness
+  // Create a composed garden scene
+  const flowers = useMemo(() => {
+    const items = [];
     
-    for (let i = 0; i < count; i++) {
-      // Determine layer based on z-position
-      const layerRandom = Math.random();
-      let layer: 'foreground' | 'midground' | 'background';
-      let zRange: [number, number];
-      let scaleRange: [number, number];
-      let spreadX: number;
-      let spreadY: number;
+    // Central Rose (Hero)
+    items.push(
+      <RedRose 
+        key="hero-rose" 
+        position={[0, 0, 1]} 
+        scale={isMobile ? 1.5 : 2} 
+        rotation={[0.2, 0, 0]}
+      />
+    );
+
+    // Surrounding White Tulips
+    const tulipCount = isMobile ? 4 : 8;
+    for (let i = 0; i < tulipCount; i++) {
+      const angle = (i / tulipCount) * Math.PI * 2;
+      const radius = isMobile ? 2.5 : 4.5;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius * 0.5 - 1; // Oval distribution
+      const z = -2 - Math.random() * 3;
       
-      if (layerRandom < 0.25) {
-        // Foreground - closest to camera, larger, limited spread
-        layer = 'foreground';
-        zRange = [3, 6];
-        scaleRange = [0.8, 1.4];
-        spreadX = 8;
-        spreadY = 6;
-      } else if (layerRandom < 0.65) {
-        // Midground - medium depth, medium size
-        layer = 'midground';
-        zRange = [-2, 3];
-        scaleRange = [0.5, 0.9];
-        spreadX = 12;
-        spreadY = 8;
-      } else {
-        // Background - far from camera, smaller, wide spread
-        layer = 'background';
-        zRange = [-8, -2];
-        scaleRange = [0.3, 0.6];
-        spreadX = 16;
-        spreadY = 10;
-      }
-      
-      const position: [number, number, number] = [
-        (Math.random() - 0.5) * spreadX,
-        (Math.random() - 0.5) * spreadY,
-        zRange[0] + Math.random() * (zRange[1] - zRange[0])
-      ];
-      
-      const scale = scaleRange[0] + Math.random() * (scaleRange[1] - scaleRange[0]);
-      const color = colorArray[Math.floor(Math.random() * colorArray.length)];
-      const component = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
-      
-      objects.push({
-        component,
-        position,
-        scale,
-        color,
-        layer,
-        key: `shape-${i}-${layer}`
-      });
+      items.push(
+        <WhiteTulip 
+          key={`tulip-${i}`}
+          position={[x, y, z]} 
+          scale={0.8 + Math.random() * 0.4}
+          rotation={[Math.random() * 0.2, Math.random() * Math.PI, Math.random() * 0.2]} 
+        />
+      );
     }
-    
-    // Sort by z-position for proper rendering order
-    return objects.sort((a, b) => a.position[2] - b.position[2]);
+
+    // Background Floating Roses (Small)
+    const bgRoseCount = isMobile ? 3 : 6;
+    for (let i = 0; i < bgRoseCount; i++) {
+      const x = (Math.random() - 0.5) * 15;
+      const y = (Math.random() - 0.5) * 10;
+      const z = -5 - Math.random() * 5;
+      
+      items.push(
+        <RedRose 
+          key={`bg-rose-${i}`}
+          position={[x, y, z]} 
+          scale={0.4 + Math.random() * 0.3}
+          rotation={[Math.random() * Math.PI, Math.random() * Math.PI, 0]} 
+        />
+      );
+    }
+
+    return items;
   }, [isMobile]);
 
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={55} />
-      <CinematicCamera />
+      <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
+      <InteractiveCamera />
+      <GardenLighting />
       
-      <SoftLighting />
+      {flowers}
 
-      {/* Render all 3D objects */}
-      {sceneObjects.map(obj => {
-        const Component = obj.component;
-        return (
-          <Component
-            key={obj.key}
-            position={obj.position}
-            scale={obj.scale}
-            color={obj.color}
-            layer={obj.layer}
-          />
-        );
-      })}
-
-      {/* Soft fog for atmospheric depth */}
-      <fog attach="fog" args={['#0f172a', 12, 30]} />
+      <fog attach="fog" args={['#020617', 5, 25]} />
     </>
   );
 };
@@ -448,13 +253,9 @@ const ThreeBackground: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -462,22 +263,17 @@ const ThreeBackground: React.FC = () => {
     <div className="fixed inset-0 z-0 pointer-events-none">
       <Canvas
         shadows
-        dpr={isMobile ? [1, 1.5] : [1, 2]}
+        dpr={[1, 2]}
         gl={{ 
           antialias: true, 
           alpha: true,
-          powerPreference: isMobile ? "low-power" : "high-performance",
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.2,
         }}
         style={{ background: 'transparent' }}
-        frameloop="always"
       >
         <Scene isMobile={isMobile} />
       </Canvas>
-      
-      {/* Soft gradient overlay for UI readability */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950/85 via-slate-900/70 to-slate-950/85 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-transparent to-slate-950/80 pointer-events-none" />
     </div>
   );
 };
