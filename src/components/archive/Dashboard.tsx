@@ -1,13 +1,13 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Upload, Lock, Star, PeanutIcon, Crosshair, RoseIcon, TulipIcon, ButterflyIcon, Search, AlertTriangle, BlueElement, Trash2, WakuWakuIcon } from './Icons';
-import { ArchiveImage } from '../types';
-import { CHARACTERS, DIRECTORY_PATH, DB_CONFIG } from '../constants';
-import { dbService } from '../services/db';
-import { apiService } from '../services/api';
+import { LogOut, Upload, Lock, Star, PeanutIcon, Crosshair, RoseIcon, TulipIcon, ButterflyIcon, Search, AlertTriangle, BlueElement, Trash2, WakuWakuIcon } from '../icons/index';
+import { ArchiveImage } from '../../types';
+import { CHARACTERS, DIRECTORY_PATH, DB_CONFIG } from '../../constants';
+import { dbService } from '../../services/db';
+import { apiService } from '../../services/api';
 import VisitorVisor from './VisitorVisor';
 import VisionGallery from './VisionGallery';
-import CustomAlert from './CustomAlert';
+import CustomAlert from '../ui/CustomAlert';
 
 const compressImageToBase64 = (file: File, quality = 0.8, maxWidth = 800): Promise<string> => {
     return new Promise((resolve, reject) => {

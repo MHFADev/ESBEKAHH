@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, Lock } from './Icons';
+import { AlertTriangle, Lock } from '../icons/index';
 
 interface CustomAlertProps {
   isOpen: boolean;

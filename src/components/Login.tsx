@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, AlertTriangle, Star, Bomb, RoseIcon, TulipIcon, BlueElement, PeanutIcon } from './Icons';
+import { Lock, AlertTriangle, Star, Bomb, RoseIcon, TulipIcon, BlueElement, PeanutIcon } from './icons/index';
 import { ALLOWED_AGENTS, MASTER_KEY } from '../constants';
 
 interface LoginProps {

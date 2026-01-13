@@ -1,4 +1,4 @@
-import { ArchiveImage } from '../types';
+import { ArchiveImage } from '../types/index';
 
 const DB_NAME = 'EsbekahhSecureDB';
 const DB_VERSION = 1;

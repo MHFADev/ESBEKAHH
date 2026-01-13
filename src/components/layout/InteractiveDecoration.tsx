@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useSpring, useMotionValue } from 'framer-motion';
-import { PeanutIcon, ButterflyIcon, Star } from './Icons';
+import { PeanutIcon, ButterflyIcon, Star } from '../icons/index';
 
 const FloatingPeanut = () => {
   const [position, setPosition] = useState({ x: Math.random() * 100, y: Math.random() * 100 });

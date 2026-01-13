@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArchiveImage } from '../types';
-import { Search, Lock, Star, ButterflyIcon } from './Icons';
+import { ArchiveImage } from '../../types';
+import { Search, Lock, Star, ButterflyIcon } from '../icons/index';
 
 interface VisionGalleryProps {
   images: ArchiveImage[];

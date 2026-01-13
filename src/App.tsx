@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import ThreeBackground from './components/ThreeBackground';
+import ThreeBackground from './components/layout/ThreeBackground';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+import Dashboard from './components/archive/Dashboard';
 import Landing from './components/Landing';
-import { ViewState, ArchiveImage } from './types';
+import { ViewState, ArchiveImage } from './types/index';
 import { dbService } from './services/db';
 import { apiService } from './services/api';
-import InteractiveDecoration from './components/InteractiveDecoration';
+import InteractiveDecoration from './components/layout/InteractiveDecoration';
 
 export default function App() {
   const [view, setView] = useState<ViewState>('LANDING');

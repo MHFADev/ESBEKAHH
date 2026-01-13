@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
-import { ArchiveImage } from '../types';
-import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon, Crosshair, WakuWakuIcon } from './Icons';
-import { CHARACTERS } from '../constants';
+import { ArchiveImage } from '../../types';
+import { PeanutIcon, ButterflyIcon, Star, Lock, Search, RoseIcon, TulipIcon, Crosshair, WakuWakuIcon } from '../icons/index';
+import { CHARACTERS } from '../../constants';
 import VisionGallery from './VisionGallery';
 
 interface VisitorVisorProps {

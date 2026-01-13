@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { PeanutIcon, PistolIcon, Star, RoseIcon, TulipIcon, ButterflyIcon } from './Icons';
+import { PeanutIcon, PistolIcon, Star, RoseIcon, TulipIcon, ButterflyIcon } from './icons/index';
 import { CHARACTERS } from '../constants';
 
 interface LandingProps {

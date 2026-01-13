@@ -1,4 +1,4 @@
-import { ArchiveImage } from '../types';
+import { ArchiveImage } from '../types/index';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 const API_BASE = `${SUPABASE_URL}/functions/v1`;
