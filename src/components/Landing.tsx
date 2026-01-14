@@ -90,7 +90,7 @@ const Landing: React.FC<LandingProps> = ({ onVisitorEntry, onMemberEntry }) => {
 
       {/* CENTER DIVIDER (Visual) */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none w-full md:w-auto flex flex-col md:flex-row items-center justify-center gap-4 px-4">
-        <div className="hidden md:block h-[30vh] w-[1px] bg-gradient-to-b from-transparent via-spy-gold/50 to-transparent" />
+        <div className="hidden md:block h-[20vh] w-[1px] bg-gradient-to-b from-transparent via-spy-gold/50 to-transparent" />
         <motion.div 
           initial={{ rotate: 0, scale: 0.8 }}
           animate={{ rotate: 45, scale: 1 }}
@@ -98,8 +98,8 @@ const Landing: React.FC<LandingProps> = ({ onVisitorEntry, onMemberEntry }) => {
         >
             X
         </motion.div>
-        <div className="hidden md:block h-[30vh] w-[1px] bg-gradient-to-b from-transparent via-spy-gold/50 to-transparent" />
-        <div className="md:hidden w-full h-[1px] bg-gradient-to-r from-transparent via-spy-gold/50 to-transparent" />
+        <div className="hidden md:block h-[20vh] w-[1px] bg-gradient-to-b from-transparent via-spy-gold/50 to-transparent" />
+        <div className="md:hidden w-1/2 h-[1px] bg-gradient-to-r from-transparent via-spy-gold/50 to-transparent" />
       </div>
 
       {/* RIGHT SIDE: MEMBER (Spy/Yor/Loid Theme - Deep Red Rose, Navy, Black) */}
