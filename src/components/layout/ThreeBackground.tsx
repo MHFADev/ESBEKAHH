@@ -44,8 +44,8 @@ const SecretDevice = () => {
     <primitive 
       ref={deviceRef}
       object={obj} 
-      scale={2.5} 
-      position={[4, 1, -2]} 
+      scale={12} 
+      position={[0, 0, -2]} 
       rotation={[0, 0, 0]}
     />
   );
