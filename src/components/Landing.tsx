@@ -88,7 +88,7 @@ const Landing: React.FC<LandingProps> = ({ onVisitorEntry, onMemberEntry }) => {
         </div>
       </motion.div>
 
-      {/* CENTER DIVIDER (Visual) */}
+      {/* CENTER DIVIDER (Visual) - Removed X and Lines per user request */}
       <motion.div 
         animate={{ 
           opacity: hoveredSide ? 1 : 0.8,
@@ -96,42 +96,6 @@ const Landing: React.FC<LandingProps> = ({ onVisitorEntry, onMemberEntry }) => {
         }}
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none w-full md:w-auto flex flex-col md:flex-row items-center justify-center gap-4 px-4"
       >
-        <motion.div 
-          animate={{ 
-            height: hoveredSide ? '25vh' : '20vh',
-            backgroundColor: hoveredSide === 'visitor' ? '#FFB7C5' : (hoveredSide === 'member' ? '#722F37' : '#C5A059')
-          }}
-          className="hidden md:block w-[1px] bg-gradient-to-b from-transparent via-current to-transparent transition-colors duration-500" 
-        />
-        <motion.div 
-          initial={{ rotate: 0, scale: 0.8 }}
-          animate={{ 
-            rotate: hoveredSide ? 225 : 45, 
-            scale: hoveredSide ? 1.1 : 1,
-            borderColor: hoveredSide === 'visitor' ? '#FFB7C5' : (hoveredSide === 'member' ? '#722F37' : '#C5A059'),
-            color: hoveredSide === 'visitor' ? '#FFB7C5' : (hoveredSide === 'member' ? '#722F37' : '#C5A059'),
-            boxShadow: hoveredSide 
-              ? `0 0 30px ${hoveredSide === 'visitor' ? 'rgba(255,183,197,0.4)' : 'rgba(114,47,55,0.4)'}`
-              : '0 0 20px rgba(197,160,89,0.3)'
-          }}
-          className="bg-spy-dark font-display font-bold text-lg md:text-xl px-4 py-2 rounded border transition-colors duration-500 backdrop-blur-md"
-        >
-            X
-        </motion.div>
-        <motion.div 
-          animate={{ 
-            height: hoveredSide ? '25vh' : '20vh',
-            backgroundColor: hoveredSide === 'visitor' ? '#FFB7C5' : (hoveredSide === 'member' ? '#722F37' : '#C5A059')
-          }}
-          className="hidden md:block w-[1px] bg-gradient-to-b from-transparent via-current to-transparent transition-colors duration-500" 
-        />
-        <motion.div 
-          animate={{ 
-            width: hoveredSide ? '60%' : '50%',
-            backgroundColor: hoveredSide === 'visitor' ? '#FFB7C5' : (hoveredSide === 'member' ? '#722F37' : '#C5A059')
-          }}
-          className="md:hidden h-[1px] bg-gradient-to-r from-transparent via-current to-transparent transition-colors duration-500" 
-        />
       </motion.div>
 
       {/* RIGHT SIDE: MEMBER (Spy/Yor/Loid Theme - Deep Red Rose, Navy, Black) */}
