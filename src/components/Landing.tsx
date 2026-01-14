@@ -203,11 +203,15 @@ const Landing: React.FC<LandingProps> = ({ onVisitorEntry, onMemberEntry }) => {
       </motion.div>
 
       {/* FOOTER OVERLAY */}
-      <div className="absolute bottom-10 left-0 w-full text-center pointer-events-none z-20 mix-blend-overlay">
-         <h1 className="text-8xl md:text-9xl font-display font-black text-white/5 tracking-tighter">
-            ESBEKAHH
-         </h1>
-      </div>
+      <div 
+  className="absolute bottom-10 left-0 w-full flex justify-center pointer-events-none z-20 mix-blend-overlay select-none" 
+  aria-hidden="true"
+>
+   <span className="text-[12vw] leading-none font-display font-black text-white/5 tracking-tighter uppercase whitespace-nowrap">
+      ESBEKAHH
+   </span>
+</div>
+
       <div className="absolute top-10 w-full text-center pointer-events-none z-20">
          <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-black/40 border border-spy-gold/30 backdrop-blur-md">
             <Star className="w-4 h-4 text-spy-gold fill-spy-gold" />

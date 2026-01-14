@@ -15,12 +15,13 @@ const SecretDevice = () => {
 
   useFrame((state) => {
     if (deviceRef.current) {
-      // Gentle rotation
-      deviceRef.current.rotation.y += 0.005;
-      deviceRef.current.rotation.z = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.1;
+      // Zoom in and out effect using scale
+      const time = state.clock.getElapsedTime();
+      const pulseScale = 12 + Math.sin(time * 0.5) * 2;
+      deviceRef.current.scale.set(pulseScale, pulseScale, pulseScale);
       
       // Floating effect
-      deviceRef.current.position.y = Math.sin(state.clock.getElapsedTime()) * 0.2;
+      deviceRef.current.position.y = Math.sin(time) * 0.2;
     }
   });
 
