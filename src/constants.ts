@@ -25,12 +25,12 @@ export const MOCK_IMAGES = [
 // &n=-1 ensures we don't get a cached error
 // &output=png ensures we keep transparency
 export const CHARACTERS = {
-  anya_peace: '/assets/anya_peace.png',
-  anya_bond: '/assets/anya_bond.png',
-  loid_standing: '/assets/loid_standing.png',
-  loid_action: '/assets/loid_aiming.png',
-  yor_portrait: '/assets/yor_portrait.png',
-  loid_gun: '/assets/loid_aiming.png',
+  anya_peace: '/assets/anya_peace.webp',
+  anya_bond: '/assets/anya_bond.webp',
+  loid_standing: '/assets/loid_standing.webp',
+  loid_action: '/assets/loid_aiming.webp',
+  yor_portrait: '/assets/yor_portrait.webp',
+  loid_gun: '/assets/loid_aiming.webp',
   rose: '/attached_assets/Desain_tanpa_judul_20260106_143956_0000_1767685233132.png',
   tulips: '/attached_assets/20260106_143652_0000_1767685257653.png',
   white_tulip: '/attached_assets/Desain_tanpa_judul_20260106_143827_0000_1767685257511.png'
