@@ -15,13 +15,18 @@ const SecretDevice = () => {
 
   useFrame((state) => {
     if (deviceRef.current) {
-      // Zoom in and out effect using scale
       const time = state.clock.getElapsedTime();
-      const pulseScale = 12 + Math.sin(time * 0.5) * 2;
+      
+      // Much larger pulse scale for visibility
+      const pulseScale = 45 + Math.sin(time * 0.5) * 8;
       deviceRef.current.scale.set(pulseScale, pulseScale, pulseScale);
       
+      // Locked forward orientation
+      deviceRef.current.rotation.set(0, 0, 0);
+      
       // Floating effect
-      deviceRef.current.position.y = Math.sin(time) * 0.2;
+      deviceRef.current.position.y = Math.sin(time) * 0.8;
+      deviceRef.current.position.z = 6; // Very close to the camera for maximum visibility
     }
   });
 
@@ -45,8 +50,8 @@ const SecretDevice = () => {
     <primitive 
       ref={deviceRef}
       object={obj} 
-      scale={12} 
-      position={[0, 0, -2]} 
+      scale={15} 
+      position={[0, 0, 2]} 
       rotation={[0, 0, 0]}
     />
   );
