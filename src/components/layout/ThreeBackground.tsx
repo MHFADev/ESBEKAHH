@@ -1,7 +1,55 @@
-import React, { useRef, useMemo, useState, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import React, { useRef, useMemo, useState, useEffect, Suspense } from 'react';
+import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
 import { Points, PointMaterial, Float, Stars, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
+import { OBJLoader } from 'three-stdlib';
+
+// ====================================
+// SECRET DEVICE (Custom 3D Model)
+// ====================================
+
+const SecretDevice = () => {
+  const obj = useLoader(OBJLoader, '/models/secret_device.obj');
+  const deviceRef = useRef<THREE.Group>(null);
+  const [hovered, setHovered] = useState(false);
+
+  useFrame((state) => {
+    if (deviceRef.current) {
+      // Gentle rotation
+      deviceRef.current.rotation.y += 0.005;
+      deviceRef.current.rotation.z = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.1;
+      
+      // Floating effect
+      deviceRef.current.position.y = Math.sin(state.clock.getElapsedTime()) * 0.2;
+    }
+  });
+
+  // Apply custom material to the model
+  useEffect(() => {
+    obj.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.material = new THREE.MeshStandardMaterial({
+          color: '#C5A059',
+          metalness: 0.8,
+          roughness: 0.2,
+          emissive: '#722F37',
+          emissiveIntensity: 0.2,
+          wireframe: false
+        });
+      }
+    });
+  }, [obj]);
+
+  return (
+    <primitive 
+      ref={deviceRef}
+      object={obj} 
+      scale={2.5} 
+      position={[4, 1, -2]} 
+      rotation={[0, 0, 0]}
+    />
+  );
+};
 
 // ====================================
 // THEMATIC PARTICLES (Garden Petals & Tech Dust)
@@ -130,9 +178,16 @@ const Scene = () => {
       {/* Stella Stars */}
       <StellaStars />
 
+      {/* Secret Device Model */}
+      <Suspense fallback={null}>
+        <SecretDevice />
+      </Suspense>
+
       {/* Grid Floor */}
       <group position={[0, -5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <gridHelper args={[50, 50, '#E14D68', '#0B1026']} opacity={0.2} transparent />
+        <gridHelper args={[50, 50, 0x722f37, 0x0b1026]}>
+          <meshBasicMaterial attach="material" transparent opacity={0.2} color="#722F37" />
+        </gridHelper>
       </group>
     </group>
   );
