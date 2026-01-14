@@ -28,7 +28,8 @@ const compressImageToBase64 = (file: File, quality = 0.8, maxWidth = 800): Promi
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx?.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', quality));
+                // Force conversion to image/webp
+                resolve(canvas.toDataURL('image/webp', quality));
             };
             img.onerror = (err) => reject(err);
         };
@@ -118,8 +119,7 @@ const Dashboard: React.FC<DashboardProps> = ({ agentId, isReadOnly = false, onLo
     setIsUploading(true);
     try {
         const safeName = newTitle.toLowerCase().replace(/[^a-z0-9]/g, '_') || 'evidence';
-        const ext = selectedFile.name.split('.').pop() || 'jpg';
-        const finalFileName = `${safeName}_${Date.now()}.${ext}`;
+        const finalFileName = `${safeName}_${Date.now()}.webp`;
         const thumbnailData = await compressImageToBase64(selectedFile, 0.6, 400);
         const originalData = await compressImageToBase64(selectedFile, 0.85, 1920);
         let uploadResponse;
