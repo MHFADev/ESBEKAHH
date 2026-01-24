@@ -1,61 +1,7 @@
-import React, { useRef, useMemo, useState, useEffect, Suspense } from 'react';
-import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
+import React, { useRef, useMemo } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Points, PointMaterial, Float, Stars, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
-import { OBJLoader } from 'three-stdlib';
-
-// ====================================
-// SECRET DEVICE (Custom 3D Model)
-// ====================================
-
-const SecretDevice = () => {
-  const obj = useLoader(OBJLoader, '/models/secret_device.obj');
-  const deviceRef = useRef<THREE.Group>(null);
-  const [hovered, setHovered] = useState(false);
-
-  useFrame((state) => {
-    if (deviceRef.current) {
-      const time = state.clock.getElapsedTime();
-      
-      // Much larger pulse scale for visibility
-      const pulseScale = 45 + Math.sin(time * 0.5) * 8;
-      deviceRef.current.scale.set(pulseScale, pulseScale, pulseScale);
-      
-      // Locked forward orientation
-      deviceRef.current.rotation.set(0, 0, 0);
-      
-      // Floating effect
-      deviceRef.current.position.y = Math.sin(time) * 0.8;
-      deviceRef.current.position.z = 6; // Very close to the camera for maximum visibility
-    }
-  });
-
-  // Apply custom material to the model
-  useEffect(() => {
-    obj.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        child.material = new THREE.MeshStandardMaterial({
-          color: '#C5A059',
-          metalness: 0.8,
-          roughness: 0.2,
-          emissive: '#722F37',
-          emissiveIntensity: 0.2,
-          wireframe: false
-        });
-      }
-    });
-  }, [obj]);
-
-  return (
-    <primitive 
-      ref={deviceRef}
-      object={obj} 
-      scale={15} 
-      position={[0, 0, 2]} 
-      rotation={[0, 0, 0]}
-    />
-  );
-};
 
 // ====================================
 // THEMATIC PARTICLES (Garden Petals & Tech Dust)
@@ -183,11 +129,6 @@ const Scene = () => {
       
       {/* Stella Stars */}
       <StellaStars />
-
-      {/* Secret Device Model */}
-      <Suspense fallback={null}>
-        <SecretDevice />
-      </Suspense>
 
       {/* Grid Floor */}
       <group position={[0, -5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
